@@ -20,16 +20,18 @@ codepipeline_role = aws.iam.Role("codepipelineRole", assume_role_policy = """{
   ]
 } 
 }""")
-s3kmskey = aws.kms.get_alias(name="alias/mykmskey")
+# s3kmskey = aws.kms.get_alias(name="alias/mykmskey")
+#encryption key
 codepipeline = aws.codepipeline.Pipeline("PulumiCodePipeline",
     role_arn=codepipeline_role.arn,
     artifact_store=aws.codepipeline.PipelineArtifactStoreArgs(
         location=codepipeline_bucket.bucket,
         type="S3",
-        encryption_key=aws.codepipeline.PipelineArtifactStoreEncryptionKeyArgs(
-            id=s3kmskey.arn,
-            type="KMS",
-        ),
+        #take the key out for now and see if i can do without the encryption for now 
+        # encryption_key=aws.codepipeline.PipelineArtifactStoreEncryptionKeyArgs(
+        #     id=s3kmskey.arn,
+        #     type="KMS",
+        # ),
     ),
     stages=[
         aws.codepipeline.PipelineStageArgs(
@@ -82,7 +84,43 @@ codepipeline = aws.codepipeline.Pipeline("PulumiCodePipeline",
             )],
         ),
     ])
-
+codepipeline_policy = aws.iam.RolePolicy("codepipelinePolicy",
+    role=codepipeline_role.id,
+    policy=pulumi.Output.all(codepipeline_bucket.arn, codepipeline_bucket.arn, connection.arn).apply(lambda codepipelineBucketArn, codepipelineBucketArn1, connectionArn: f"""{{
+  "Version": "2012-10-17",
+  "Statement": [
+    {{
+      "Effect":"Allow",
+      "Action": [
+        "s3:GetObject",
+        "s3:GetObjectVersion",
+        "s3:GetBucketVersioning",
+        "s3:PutObjectAcl",
+        "s3:PutObject"
+      ],
+      "Resource": [
+        "{codepipeline_bucket_arn}",
+        "{codepipeline_bucket_arn1}/*"
+      ]
+    }},
+    {{
+      "Effect": "Allow",
+      "Action": [
+        "codestar-connections:UseConnection"
+      ],
+      "Resource": "{connection_arn}"
+    }},
+    {{
+      "Effect": "Allow",
+      "Action": [
+        "codebuild:BatchGetBuilds",
+        "codebuild:StartBuild"
+      ],
+      "Resource": "*"
+    }}
+  ]
+}}
+"""))
 
 
 pulumi.export("arn", connection.arn)
