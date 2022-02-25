@@ -1,31 +1,36 @@
 """An AWS Python Pulumi program"""
 
+from cgitb import handler
+from operator import index
 import pulumi
 import pulumi_aws as aws
+from iam import *
 
+#connection for Github
 connection = aws.codestarconnections.Connection(
     "github_connection", 
     provider_type="GitHub")
-codepipeline_bucket = aws.s3.Bucket("codepipelineBucket", acl = "private")
-codepipeline_role = aws.iam.Role("codepipelineRole", assume_role_policy = """{
-   "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Principal": {
-        "Service": "codepipeline.amazonaws.com"
-      },
-      "Action": "sts:AssumeRole"
-    }
-  ]
-} 
-}""")
+#bucket for the build to zip all the files
+codepipeline_bucketzip = aws.s3.Bucket("codepipelineBucketZipped")
+
+#bucket for lambda to put unzipped artifacts 
+lambda_bucket = aws.s3.Bucket("codepipelinePulumi")
+#lambda role
+
+#lambda function for pipeline
+pipelineLambda = aws.lambda_.function("Pulumifunction",
+  code = pulumi.FileArchive("./lambda.zip"),
+  role = lambdarole.arn,
+  runtime = "python3.8",
+  handler = "lambda.handler",
+  )
+
 # s3kmskey = aws.kms.get_alias(name="alias/mykmskey")
 #encryption key
 codepipeline = aws.codepipeline.Pipeline("PulumiCodePipeline",
     role_arn=codepipeline_role.arn,
     artifact_store=aws.codepipeline.PipelineArtifactStoreArgs(
-        location=codepipeline_bucket.bucket,
+        location=codepipeline_bucketzip.bucket,
         type="S3",
         #take the key out for now and see if i can do without the encryption for now 
         # encryption_key=aws.codepipeline.PipelineArtifactStoreEncryptionKeyArgs(
@@ -45,7 +50,7 @@ codepipeline = aws.codepipeline.Pipeline("PulumiCodePipeline",
                 output_artifacts=["source_output"],
                 configuration={
                     "ConnectionArn": connection.arn,
-                    "FullRepositoryId": "my-organization/example",
+                    "FullRepositoryId": "aliciousness/new_website",
                     "BranchName": "main",
                 },
             )],
@@ -66,61 +71,22 @@ codepipeline = aws.codepipeline.Pipeline("PulumiCodePipeline",
             )],
         ),
         aws.codepipeline.PipelineStageArgs(
-            name="Deploy",
+            name="Invoke",
             actions=[aws.codepipeline.PipelineStageActionArgs(
-                name="Deploy",
-                category="Deploy",
+                name="Invoke",
+                category="Invoke",
                 owner="AWS",
-                provider="CloudFormation",
+                provider="Lamba",
                 input_artifacts=["build_output"],
                 version="1",
                 configuration={
-                    "ActionMode": "REPLACE_ON_FAILURE",
-                    "Capabilities": "CAPABILITY_AUTO_EXPAND,CAPABILITY_IAM",
-                    "OutputFileName": "CreateStackOutput.json",
-                    "StackName": "MyStack",
-                    "TemplatePath": "build_output::sam-templated.yaml",
+                  "FunctionName": "PulumiFunction"
+                    
                 },
             )],
         ),
     ])
-codepipeline_policy = aws.iam.RolePolicy("codepipelinePolicy",
-    role=codepipeline_role.id,
-    policy=pulumi.Output.all(codepipeline_bucket.arn, codepipeline_bucket.arn, connection.arn).apply(lambda codepipelineBucketArn, codepipelineBucketArn1, connectionArn: f"""{{
-  "Version": "2012-10-17",
-  "Statement": [
-    {{
-      "Effect":"Allow",
-      "Action": [
-        "s3:GetObject",
-        "s3:GetObjectVersion",
-        "s3:GetBucketVersioning",
-        "s3:PutObjectAcl",
-        "s3:PutObject"
-      ],
-      "Resource": [
-        "{codepipeline_bucket_arn}",
-        "{codepipeline_bucket_arn1}/*"
-      ]
-    }},
-    {{
-      "Effect": "Allow",
-      "Action": [
-        "codestar-connections:UseConnection"
-      ],
-      "Resource": "{connection_arn}"
-    }},
-    {{
-      "Effect": "Allow",
-      "Action": [
-        "codebuild:BatchGetBuilds",
-        "codebuild:StartBuild"
-      ],
-      "Resource": "*"
-    }}
-  ]
-}}
-"""))
+
 
 
 pulumi.export("arn", connection.arn)
