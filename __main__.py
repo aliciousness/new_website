@@ -15,11 +15,11 @@ lambda_bucket = aws.s3.Bucket("codepipelinePulumi")
 
 
 #lambda function for pipeline
-pipelineLambda = aws.lambda_.function("Pulumifunction",
+pipelineLambda = aws.lambda_.Function("Pulumifunction",
   code = pulumi.FileArchive("./lambda.zip"),
   role = lambdarole.arn,
   runtime = "python3.8",
-  handler = "lambda.handler",
+  handler = "index.test"
 )
 
 #lambda permission
@@ -53,7 +53,7 @@ codepipeline = aws.codepipeline.Pipeline("PulumiCodePipeline",
                 output_artifacts=["source_output"],
                 configuration={
                     "ConnectionArn": connection.arn,
-                    "FullRepositoryId": "aliciousness/new_website",
+                    "FullRepositoryId": "aliciousness/new_website/website",
                     "BranchName": "main",
                 },
             )],
@@ -100,7 +100,7 @@ connectPolicy = aws.iam.RolePolicy("connectionPolicy",
                       "codebuild:BatchGetBuilds",
                       "codebuild:StartBuild"],
                 "Effect": "Allow",
-                "Resource":f"{connection.arn}",
+                "Resource":"arn:aws:codestar-connections:us-east-1:037484876593:connection/fd390b15-f09d-41f7-8382-1a477b9f2455",
                 
             }]
     }))

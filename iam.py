@@ -7,7 +7,7 @@ lambdarole = aws.iam.Role("iamForLambda", assume_role_policy="""{
   "Version": "2012-10-17",
   "Statement": [
     {
-      "Action": "sts:Assumerole",
+      "Action": "sts:AssumeRole",
       "Principal": {
         "Service": "lambda.amazonaws.com"
       },
@@ -20,21 +20,21 @@ lambdarole = aws.iam.Role("iamForLambda", assume_role_policy="""{
 
 #role for pipeline 
 codepipeline_role = aws.iam.Role("codepipelineRole", assume_role_policy = """{
-   "Version": "2012-10-17",
+  "Version": "2012-10-17",
   "Statement": [
     {
-      "Effect": "Allow",
+      "Action": "sts:AssumeRole",
       "Principal": {
         "Service": "codepipeline.amazonaws.com"
       },
-      "Action": "sts:AssumeRole"
+      "Effect": "Allow",
+      "Sid": ""
     }
   ]
-} 
 }""")
 role_policy_attachment = aws.iam.RolePolicyAttachment("lambdaRoleAttachment",
     role=lambdarole.name, 
-    policy_arn=aws.iam.ManagedPolicy.AWS_LAMBDA_FULL_ACCESS)
+    policy_arn=aws.iam.ManagedPolicy.ADMINISTRATOR_ACCESS)
 
 pipeline_attachment = aws.iam.RolePolicyAttachment(
     "pipelineRoleAttachment",
