@@ -1,8 +1,5 @@
 """An AWS Python Pulumi program"""
-
-from cgitb import handler
-from operator import index
-import pulumi
+import pulumi, json
 import pulumi_aws as aws
 from iam import *
 
@@ -15,7 +12,7 @@ codepipeline_bucketzip = aws.s3.Bucket("codepipelineBucketZipped")
 
 #bucket for lambda to put unzipped artifacts 
 lambda_bucket = aws.s3.Bucket("codepipelinePulumi")
-#lambda role
+
 
 #lambda function for pipeline
 pipelineLambda = aws.lambda_.function("Pulumifunction",
@@ -23,7 +20,13 @@ pipelineLambda = aws.lambda_.function("Pulumifunction",
   role = lambdarole.arn,
   runtime = "python3.8",
   handler = "lambda.handler",
-  )
+)
+
+#lambda permission
+lambda_permission = aws.lambda_.Permission("lambdaPermission", 
+    action="lambda:InvokeFunction",
+    principal="s3.amazonaws.com",
+    function= pipelineLambda)
 
 # s3kmskey = aws.kms.get_alias(name="alias/mykmskey")
 #encryption key
@@ -87,8 +90,22 @@ codepipeline = aws.codepipeline.Pipeline("PulumiCodePipeline",
         ),
     ])
 
+connectPolicy = aws.iam.RolePolicy("connectionPolicy",
+  role = codepipeline_role.id,
+  policy = json.dumps({
+        "Version": "2012-10-17",
+        "Statement": [{
+                "Action": 
+                     ["codestar-connections:UseConnection",
+                      "codebuild:BatchGetBuilds",
+                      "codebuild:StartBuild"],
+                "Effect": "Allow",
+                "Resource":f"{connection.arn}",
+                
+            }]
+    }))
 
-
-pulumi.export("arn", connection.arn)
+pulumi.export("connection arn", connection.arn)
 pulumi.export("connection status", connection.connection_status)
 pulumi.export("connection id", connection.id)
+pulumi.export("lambda arn", pipelineLambda.arn)

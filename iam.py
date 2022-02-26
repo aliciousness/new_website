@@ -1,13 +1,13 @@
 import pulumi
 import pulumi_aws as aws 
-from __main__ import *
+import __main__
 
 # role for lambda 
 lambdarole = aws.iam.Role("iamForLambda", assume_role_policy="""{
   "Version": "2012-10-17",
   "Statement": [
     {
-      "Action": "sts:AssumeRole",
+      "Action": "sts:Assumerole",
       "Principal": {
         "Service": "lambda.amazonaws.com"
       },
@@ -34,42 +34,11 @@ codepipeline_role = aws.iam.Role("codepipelineRole", assume_role_policy = """{
 }""")
 role_policy_attachment = aws.iam.RolePolicyAttachment("lambdaRoleAttachment",
     role=lambdarole.name, 
-    policy_arn=aws.iam.ManagedPolicy.AWS_LAMBDA_BASIC_EXECUTION_ROLE)
+    policy_arn=aws.iam.ManagedPolicy.AWS_LAMBDA_FULL_ACCESS)
 
-codepipeline_policy = aws.iam.RolePolicy("codepipelinePolicy",
-    role=codepipeline_role.id,
-    policy=pulumi.Output.all(codepipeline_bucketzip.arn, connection.arn).apply(lambda codepipelineBucketArn, codepipelineBucketArn1, connectionArn: f"""{{
-  "Version": "2012-10-17",
-  "Statement": [
-    {{
-      "Effect":"Allow",
-      "Action": [
-        "s3:GetObject",
-        "s3:GetObjectVersion",
-        "s3:GetBucketVersioning",
-        "s3:PutObjectAcl",
-        "s3:PutObject"
-      ],
-      "Resource": [
-        "{codepipeline_bucket_arn}",
-        "{codepipeline_bucket_arn1}/*"
-      ]
-    }},
-    {{
-      "Effect": "Allow",
-      "Action": [
-        "codestar-connections:UseConnection"
-      ],
-      "Resource": "{connection_arn}"
-    }},
-    {{
-      "Effect": "Allow",
-      "Action": [
-        "codebuild:BatchGetBuilds",
-        "codebuild:StartBuild"
-      ],
-      "Resource": "*"
-    }}
-  ]
-}}
-"""))
+pipeline_attachment = aws.iam.RolePolicyAttachment(
+    "pipelineRoleAttachment",
+    role = codepipeline_role.name,
+    policy_arn= aws.iam.ManagedPolicy.AWS_CODE_PIPELINE_FULL_ACCESS
+)
+
