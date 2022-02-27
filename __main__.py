@@ -79,12 +79,11 @@ codepipeline = aws.codepipeline.Pipeline("PulumiCodePipeline",
                 name="Invoke",
                 category="Invoke",
                 owner="AWS",
-                provider="Lamba",
+                provider="Lambda",
                 input_artifacts=["build_output"],
                 version="1",
-                configuration={
+                configuration= {
                   "FunctionName": "PulumiFunction"
-                    
                 },
             )],
         ),
