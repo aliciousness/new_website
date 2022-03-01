@@ -32,6 +32,20 @@ codepipeline_role = aws.iam.Role("codepipelineRole", assume_role_policy = """{
     }
   ]
 }""")
+
+codeBuild_role = aws.iam.Role("exampleRole", assume_role_policy="""{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "codebuild.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+""")
 role_policy_attachment = aws.iam.RolePolicyAttachment("lambdaRoleAttachment",
     role=lambdarole.name, 
     policy_arn=aws.iam.ManagedPolicy.ADMINISTRATOR_ACCESS)

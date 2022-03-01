@@ -28,6 +28,22 @@ lambda_permission = aws.lambda_.Permission("lambdaPermission",
     principal="s3.amazonaws.com",
     function= pipelineLambda)
 
+codeBuild = aws.codebuild.Project("new_website",
+  artifacts = aws.codebuild.ProjectArtifactsArgs(type = "CODEPIPELINE"),
+  environment = aws.codebuild.ProjectEnvironmentArgs(
+    image= "aws/codebuild/standard:4.0",
+    type = "LINUX_GPU_CONTAINER",
+    compute_type= "BUILD_GENERAL1_LARGE"
+  ),
+  service_role= codeBuild_role.arn,
+  source= aws.codebuild.ProjectSourceArgs(
+    type= "CODEPIPELINE",
+    location = "aliciousness/new_website/website"
+  ),
+  build_timeout= 5,
+  description= "This build was built with pulumi",
+  )
+
 # s3kmskey = aws.kms.get_alias(name="alias/mykmskey")
 #encryption key
 codepipeline = aws.codepipeline.Pipeline("PulumiCodePipeline",
@@ -69,7 +85,7 @@ codepipeline = aws.codepipeline.Pipeline("PulumiCodePipeline",
                 output_artifacts=["build_output"],
                 version="1",
                 configuration={
-                    "ProjectName": "test",
+                    "ProjectName": "new_website"
                 },
             )],
         ),
@@ -88,6 +104,7 @@ codepipeline = aws.codepipeline.Pipeline("PulumiCodePipeline",
             )],
         ),
     ])
+
 
 connectPolicy = aws.iam.RolePolicy("connectionPolicy",
   role = codepipeline_role.id,
