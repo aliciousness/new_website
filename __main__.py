@@ -38,7 +38,7 @@ codeBuild = aws.codebuild.Project("new_website",
   service_role= codeBuild_role.arn,
   source= aws.codebuild.ProjectSourceArgs(
     type= "CODEPIPELINE",
-    location = "aliciousness/new_website/website"
+    location = "aliciousness/new_website"
   ),
   build_timeout= 5,
   description= "This build was built with pulumi",
@@ -69,7 +69,7 @@ codepipeline = aws.codepipeline.Pipeline("PulumiCodePipeline",
                 output_artifacts=["source_output"],
                 configuration={
                     "ConnectionArn": connection.arn,
-                    "FullRepositoryId": "aliciousness/new_website/website",
+                    "FullRepositoryId": "aliciousness/new_website",
                     "BranchName": "main",
                 },
             )],
