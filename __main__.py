@@ -28,7 +28,7 @@ lambda_permission = aws.lambda_.Permission("lambdaPermission",
     principal="s3.amazonaws.com",
     function= pipelineLambda)
 
-codeBuild = aws.codebuild.Project("new_website",
+new_website = aws.codebuild.Project("new_website",
   artifacts = aws.codebuild.ProjectArtifactsArgs(type = "CODEPIPELINE"),
   environment = aws.codebuild.ProjectEnvironmentArgs(
     image= "aws/codebuild/standard:4.0",
@@ -85,7 +85,7 @@ codepipeline = aws.codepipeline.Pipeline("PulumiCodePipeline",
                 output_artifacts=["build_output"],
                 version="1",
                 configuration={
-                    "ProjectName": "new_website"
+                    "ProjectName": new_website.name
                 },
             )],
         ),
