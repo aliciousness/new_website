@@ -48,11 +48,11 @@ codeBuild_role = aws.iam.Role("exampleRole", assume_role_policy="""{
 """)
 role_policy_attachment = aws.iam.RolePolicyAttachment("lambdaRoleAttachment",
     role=lambdarole.name, 
-    policy_arn=aws.iam.ManagedPolicy.ADMINISTRATOR_ACCESS)
+    policy_arn=aws.iam.ManagedPolicy.LAMBDA_FULL_ACCESS)
 
 pipeline_attachment = aws.iam.RolePolicyAttachment(
     "pipelineRoleAttachment",
     role = codepipeline_role.name,
-    policy_arn= aws.iam.ManagedPolicy.ADMINISTRATOR_ACCESS
+    policy_arn= aws.iam.ManagedPolicy.AWS_CODE_PIPELINE_FULL_ACCESS
 )
 
