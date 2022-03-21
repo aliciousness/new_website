@@ -28,6 +28,7 @@ lambda_permission = aws.lambda_.Permission("lambdaPermission",
     principal="s3.amazonaws.com",
     function= pipelineLambda)
 
+#codebuild project
 new_website = aws.codebuild.Project("new_website",
   artifacts = aws.codebuild.ProjectArtifactsArgs(type = "CODEPIPELINE"),
   environment = aws.codebuild.ProjectEnvironmentArgs(
@@ -121,7 +122,12 @@ connectPolicy = aws.iam.RolePolicy("connectionPolicy",
             }]
     }))
 
-pulumi.export("connection arn", connection.arn)
-pulumi.export("connection status", connection.connection_status)
-pulumi.export("connection id", connection.id)
+pulumi.export("Connect",{
+    "connection arn" : connection.arn,
+    "connection status": connection.connection_status,
+    "connection id": connection.id})
 pulumi.export("lambda arn", pipelineLambda.arn)
+pulumi.export("codebuild",  {
+    "arn": new_website.arn,
+    "id": new_website.id
+})

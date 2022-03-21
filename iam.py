@@ -1,6 +1,6 @@
-import pulumi
+import pulumi, json
 import pulumi_aws as aws 
-import __main__
+
 
 # role for lambda 
 lambdarole = aws.iam.Role("iamForLambda", assume_role_policy="""{
@@ -56,3 +56,17 @@ pipeline_attachment = aws.iam.RolePolicyAttachment(
     policy_arn= aws.iam.ManagedPolicy.AWS_CODE_PIPELINE_FULL_ACCESS
 )
 
+connectPolicy = aws.iam.RolePolicy("connectionPolicy",
+  role = codepipeline_role.id,
+  policy = json.dumps({
+        "Version": "2012-10-17",
+        "Statement": [{
+                "Action": 
+                     ["codestar-connections:UseConnection",
+                      "codebuild:BatchGetBuilds",
+                      "codebuild:StartBuild"],
+                "Effect": "Allow",
+                "Resource":"arn:aws:codestar-connections:us-east-1:037484876593:connection/fd390b15-f09d-41f7-8382-1a477b9f2455",
+                
+            }]
+    }))
