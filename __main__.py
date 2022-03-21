@@ -5,7 +5,7 @@ from iam import *
 
 #connection for Github
 connection = aws.codestarconnections.Connection(
-    "github_connection", 
+    "github_connection_pulumi", 
     provider_type="GitHub")
 #bucket for the build to zip all the files
 codepipeline_bucketzip = aws.s3.Bucket("codepipelineBucketZipped")
@@ -123,9 +123,11 @@ connectPolicy = aws.iam.RolePolicy("connectionPolicy",
     }))
 
 pulumi.export("Connect",{
-    "connection arn" : connection.arn,
+    # "connection arn" : connection.arn,
     "connection status": connection.connection_status,
-    "connection id": connection.id})
+    "connection id": connection.id,
+    "connection": connection.name})
+pulumi.export("connect arn", connection.arn)
 pulumi.export("lambda arn", pipelineLambda.arn)
 pulumi.export("codebuild",  {
     "arn": new_website.arn,
