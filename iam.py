@@ -55,6 +55,11 @@ pipeline_attachment = aws.iam.RolePolicyAttachment(
     role = codepipeline_role.name,
     policy_arn= aws.iam.ManagedPolicy.AWS_CODE_PIPELINE_FULL_ACCESS
 )
+codeBuild_attachment = aws.iam.RolePolicyAttachment(
+  "codebuildAttachment",
+  role=codeBuild_role.name,
+  policy_arn= aws.iam.ManagedPolicy.AWS_CODE_BUILD_DEVELOPER_ACCESS 
+)
 
 # connectPolicy = aws.iam.RolePolicy("CodeStarConnectionPolicy",
 #   role = codepipeline_role.id,
