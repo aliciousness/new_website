@@ -39,7 +39,10 @@ lambda_permission = aws.lambda_.Permission("lambdaPermission",
 
 #codebuild project
 new_website = aws.codebuild.Project("new_website",
-  artifacts = aws.codebuild.ProjectArtifactsArgs(type = "CODEPIPELINE"),
+  artifacts = aws.codebuild.ProjectArtifactsArgs(
+      type = "CODEPIPELINE",
+      location = "https://github.com/aliciousness/new_website"
+      ),
   environment = aws.codebuild.ProjectEnvironmentArgs(
     image= "aws/codebuild/standard:4.0",
     type = "LINUX_GPU_CONTAINER",
@@ -48,10 +51,9 @@ new_website = aws.codebuild.Project("new_website",
   service_role= codeBuild_role.arn,
   source= aws.codebuild.ProjectSourceArgs(
     type= "CODEPIPELINE",
-    location = "aliciousness/new_website"
+    location = "https://github.com/aliciousness/new_website"
   ),
   build_timeout= 5,
-  queued_timeout=5,
   description= "This build was built with pulumi",
   )
 

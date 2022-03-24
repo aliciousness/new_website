@@ -33,7 +33,7 @@ codepipeline_role = aws.iam.Role("codepipelineRole", assume_role_policy = """{
   ]
 }""")
 
-codeBuild_role = aws.iam.Role("exampleRole", assume_role_policy="""{
+codeBuild_role = aws.iam.Role("codebuildRolePulumi", assume_role_policy="""{
   "Version": "2012-10-17",
   "Statement": [
     {
