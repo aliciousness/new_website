@@ -5,13 +5,22 @@ from iam import *
 
 #connection for Github
 connection = aws.codestarconnections.Connection(
-    "github_connection_pulumi", 
+    "github_connection", 
     provider_type="GitHub")
 #bucket for the build to zip all the files
-codepipeline_bucketzip = aws.s3.Bucket("codepipelineBucketZipped")
+codepipeline_zipped = aws.s3.Bucket("codepipelineBucketZipped",
+                                       acl = "public-read-write",
+                                       
+                                       )
+codepipeline_artifcat_store = aws.s3.Bucket("codepipelineBucketArtifactStore",
+                                       acl = "public-read-write",
+                                       
+                                       )
 
 #bucket for lambda to put unzipped artifacts 
-lambda_bucket = aws.s3.Bucket("codepipelinePulumi")
+lambda_bucket = aws.s3.Bucket("codepipelinePulumi", 
+                              acl = "public-read-write"
+                              )
 
 
 #lambda function for pipeline
@@ -50,7 +59,7 @@ new_website = aws.codebuild.Project("new_website",
 codepipeline = aws.codepipeline.Pipeline("PulumiCodePipeline",
     role_arn=codepipeline_role.arn,
     artifact_store=aws.codepipeline.PipelineArtifactStoreArgs(
-        location=codepipeline_bucketzip.bucket,
+        location=codepipeline_artifcat_store.bucket,
         type="S3",
         #take the key out for now and see if i can do without the encryption for now 
         # encryption_key=aws.codepipeline.PipelineArtifactStoreEncryptionKeyArgs(
@@ -100,7 +109,7 @@ codepipeline = aws.codepipeline.Pipeline("PulumiCodePipeline",
                 input_artifacts=["build_output"],
                 version="1",
                 configuration= {
-                  "FunctionName": "PulumiFunction"
+                  "FunctionName": pipelineLambda.name
                 },
             )],
         ),
@@ -113,11 +122,11 @@ connectPolicy = aws.iam.RolePolicy("connectionPolicy",
         "Version": "2012-10-17",
         "Statement": [{
                 "Action": 
-                     ["codestar-connections:UseConnection",
+                     ["codestar-connections:*",
                       "codebuild:BatchGetBuilds",
                       "codebuild:StartBuild"],
                 "Effect": "Allow",
-                "Resource":"arn:aws:codestar-connections:us-east-1:037484876593:connection/fd390b15-f09d-41f7-8382-1a477b9f2455",
+                "Resource":"*",
                 
             }]
     }))

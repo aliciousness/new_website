@@ -4,7 +4,7 @@ from io import BytesIO
 
 def lambda_handler(event,context):
   BUCKET='codepipelineBucketZipped'
-  key='pulumi.zip'
+  key='lambda.zip'
   s3 = boto3.resource('s3')
   my_bucket = s3.Bucket(BUCKET)
 

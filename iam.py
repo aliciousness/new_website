@@ -46,21 +46,21 @@ codeBuild_role = aws.iam.Role("exampleRole", assume_role_policy="""{
   ]
 }
 """)
+
 role_policy_attachment = aws.iam.RolePolicyAttachment("lambdaRoleAttachment",
     role=lambdarole.name, 
     policy_arn=aws.iam.ManagedPolicy.LAMBDA_FULL_ACCESS)
 
-pipeline_attachment = aws.iam.RolePolicyAttachment(
-    "pipelineRoleAttachment",
-    role = codepipeline_role.name,
-    policy_arn= aws.iam.ManagedPolicy.AWS_CODE_PIPELINE_FULL_ACCESS
-)
+
 codeBuild_attachment = aws.iam.RolePolicyAttachment(
   "codebuildAttachment",
   role=codeBuild_role.name,
-  policy_arn= aws.iam.ManagedPolicy.AWS_CODE_BUILD_DEVELOPER_ACCESS 
+  policy_arn= aws.iam.ManagedPolicy.AWS_CODE_BUILD_ADMIN_ACCESS
 )
 
-# connectPolicy = aws.iam.RolePolicy("CodeStarConnectionPolicy",
-#   role = codepipeline_role.id,
-#   policy = aws.iam.ManagedPolicy.AWS_CODE_STAR_FULL_ACCESS)
+
+pulumi.export("IAM",{
+  "codebuild role arn": codeBuild_role.arn,
+  "codepipeline role arn": codepipeline_role.arn,
+  "lambda role": lambdarole.arn
+})
