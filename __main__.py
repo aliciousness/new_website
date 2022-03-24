@@ -9,17 +9,17 @@ connection = aws.codestarconnections.Connection(
     provider_type="GitHub")
 #bucket for the build to zip all the files
 codepipeline_zipped = aws.s3.Bucket("codepipelineBucketZipped",
-                                       acl = "public-read-write",
+                                       
                                        
                                        )
 codepipeline_artifcat_store = aws.s3.Bucket("codepipelineBucketArtifactStore",
-                                       acl = "public-read-write",
+                                      
                                        
                                        )
 
 #bucket for lambda to put unzipped artifacts 
 lambda_bucket = aws.s3.Bucket("codepipelinePulumi", 
-                              acl = "public-read-write"
+                             
                               )
 
 
