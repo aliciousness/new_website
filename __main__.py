@@ -54,6 +54,7 @@ new_website = aws.codebuild.Project("new_website",
     location = "https://github.com/aliciousness/new_website"
   ),
   build_timeout= 5,
+  queued_timeout= 20,
   description= "This build was built with pulumi",
   )
 
