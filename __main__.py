@@ -65,11 +65,7 @@ codepipeline = aws.codepipeline.Pipeline("PulumiCodePipeline",
     artifact_store=aws.codepipeline.PipelineArtifactStoreArgs(
         location=codepipeline_artifcat_store.bucket,
         type="S3",
-        #take the key out for now and see if i can do without the encryption for now 
-        # encryption_key=aws.codepipeline.PipelineArtifactStoreEncryptionKeyArgs(
-        #     id=s3kmskey.arn,
-        #     type="KMS",
-        # ),
+        
     ),
     stages=[
         aws.codepipeline.PipelineStageArgs(
@@ -85,6 +81,7 @@ codepipeline = aws.codepipeline.Pipeline("PulumiCodePipeline",
                     "ConnectionArn": connection.arn,
                     "FullRepositoryId": "aliciousness/new_website",
                     "BranchName": "main",
+                    
                 },
             )],
         ),
