@@ -46,6 +46,49 @@ codeBuild_role = aws.iam.Role("codebuildRolePulumi", assume_role_policy="""{
   ]
 }
 """)
+codebuild_policy = aws.iam.Policy("NewWebsiteCodebuild",
+                                  policy = """{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Resource": [
+                "*"
+            ],
+            "Action": [
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:PutLogEvents"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Resource": [
+                "*"
+            ],
+            "Action": [
+                "s3:PutObject",
+                "s3:GetObject",
+                "s3:GetObjectVersion",
+                "s3:GetBucketAcl",
+                "s3:GetBucketLocation"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "codebuild:CreateReportGroup",
+                "codebuild:CreateReport",
+                "codebuild:UpdateReport",
+                "codebuild:BatchPutTestCases",
+                "codebuild:BatchPutCodeCoverages"
+            ],
+            "Resource": [
+                "*"
+            ]
+        }
+    ]
+}""")
 codepipeline_policy = aws.iam.Policy("pipeline_policy",
                                      policy="""{
     "Version": "2012-10-17",
@@ -53,8 +96,7 @@ codepipeline_policy = aws.iam.Policy("pipeline_policy",
         {
             "Effect": "Allow",
             "Resource": [
-                "arn:aws:logs:us-east-1:037484876593:log-group:/aws/codebuild/new_website-8a91cb9",
-                "arn:aws:logs:us-east-1:037484876593:log-group:/aws/codebuild/new_website-8a91cb9:*"
+                "*"
             ],
             "Action": [
                 "logs:CreateLogGroup",
@@ -98,7 +140,7 @@ role_policy_attachment = aws.iam.RolePolicyAttachment("lambdaRoleAttachment",
 codeBuild_attachment = aws.iam.RolePolicyAttachment(
   "codebuildAttachment",
   role=codeBuild_role.name,
-  policy_arn= aws.iam.ManagedPolicy.AWS_CODE_BUILD_DEVELOPER_ACCESS
+  policy_arn= codebuild_policy.arn
 )
 
 codePipeline_attachment = aws.iam.RolePolicyAttachment(
