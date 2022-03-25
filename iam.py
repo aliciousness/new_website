@@ -2,6 +2,11 @@ import pulumi, json
 import pulumi_aws as aws 
 
 
+#artifactbucket
+codepipeline_artifact_store = aws.s3.Bucket("codepipelineBucketArtifactStore",
+                                      
+                                       
+                                       )
 # role for lambda 
 lambdarole = aws.iam.Role("iamForLambda", assume_role_policy="""{
   "Version": "2012-10-17",
@@ -47,24 +52,25 @@ codeBuild_role = aws.iam.Role("codebuildRolePulumi", assume_role_policy="""{
 }
 """)
 codebuild_policy = aws.iam.Policy("NewWebsiteCodebuild",
-                                  policy = """{
+                                  policy= codepipeline_artifact_store.arn.apply(lambda artifactS3 : f'''{{
     "Version": "2012-10-17",
     "Statement": [
-        {
+        {{
             "Effect": "Allow",
             "Resource": [
-                "*"
+                "arn:aws:logs:us-east-2:037484876593:log-group:/aws/codebuild/new_website-8a91cb9",
+                "arn:aws:logs:us-east-2:037484876593:log-group:/aws/codebuild/new_website-8a91cb9:*"
             ],
             "Action": [
                 "logs:CreateLogGroup",
                 "logs:CreateLogStream",
                 "logs:PutLogEvents"
             ]
-        },
-        {
+        }},
+        {{
             "Effect": "Allow",
             "Resource": [
-                "*"
+                "{artifactS3}"
             ],
             "Action": [
                 "s3:PutObject",
@@ -73,8 +79,8 @@ codebuild_policy = aws.iam.Policy("NewWebsiteCodebuild",
                 "s3:GetBucketAcl",
                 "s3:GetBucketLocation"
             ]
-        },
-        {
+        }},
+        {{
             "Effect": "Allow",
             "Action": [
                 "codebuild:CreateReportGroup",
@@ -84,16 +90,16 @@ codebuild_policy = aws.iam.Policy("NewWebsiteCodebuild",
                 "codebuild:BatchPutCodeCoverages"
             ],
             "Resource": [
-                "*"
+                "arn:aws:codebuild:us-east-2:037484876593:report-group/new_website-*"
             ]
-        }
+        }}
     ]
-}""")
+}}'''))
 codepipeline_policy = aws.iam.Policy("pipeline_policy",
-                                     policy="""{
+                                     policy=codepipeline_artifact_store.arn.apply(lambda artifactS3 : f"""{{
     "Version": "2012-10-17",
     "Statement": [
-        {
+        {{
             "Effect": "Allow",
             "Resource": [
                 "*"
@@ -103,11 +109,11 @@ codepipeline_policy = aws.iam.Policy("pipeline_policy",
                 "logs:CreateLogStream",
                 "logs:PutLogEvents"
             ]
-        },
-        {
+        }},
+        {{
             "Effect": "Allow",
             "Resource": [
-                "arn:aws:s3:::codepipeline-us-east-1-*"
+                "{artifactS3}"
             ],
             "Action": [
                 "s3:PutObject",
@@ -116,8 +122,8 @@ codepipeline_policy = aws.iam.Policy("pipeline_policy",
                 "s3:GetBucketAcl",
                 "s3:GetBucketLocation"
             ]
-        },
-        {
+        }},
+        {{
             "Effect": "Allow",
             "Action": [
                 "codebuild:CreateReportGroup",
@@ -129,9 +135,9 @@ codepipeline_policy = aws.iam.Policy("pipeline_policy",
             "Resource": [
                 "arn:aws:codebuild:us-east-1:037484876593:report-group/new_website-8a91cb9-*"
             ]
-        }
+        }}
     ]
-}""")
+}}"""))
 role_policy_attachment = aws.iam.RolePolicyAttachment("lambdaRoleAttachment",
     role=lambdarole.name, 
     policy_arn=aws.iam.ManagedPolicy.LAMBDA_FULL_ACCESS)

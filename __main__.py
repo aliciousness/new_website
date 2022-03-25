@@ -12,10 +12,7 @@ codepipeline_zipped = aws.s3.Bucket("codepipelineBucketZipped",
                                        
                                        
                                        )
-codepipeline_artifcat_store = aws.s3.Bucket("codepipelineBucketArtifactStore",
-                                      
-                                       
-                                       )
+
 
 #bucket for lambda to put unzipped artifacts 
 lambda_bucket = aws.s3.Bucket("codepipelinePulumi", 
@@ -63,7 +60,7 @@ new_website = aws.codebuild.Project("new_website",
 codepipeline = aws.codepipeline.Pipeline("PulumiCodePipeline",
     role_arn=codepipeline_role.arn,
     artifact_store=aws.codepipeline.PipelineArtifactStoreArgs(
-        location=codepipeline_artifcat_store.bucket,
+        location=codepipeline_artifact_store.bucket,
         type="S3",
         
     ),
