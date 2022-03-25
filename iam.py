@@ -109,13 +109,13 @@ codeBuild_attachment = aws.iam.RolePolicyAttachment(
 codeBuild_attachment = aws.iam.RolePolicyAttachment(
   "codebuildAttachment2",
   role=codeBuild_role.name,
-  policy_arn= aws.iam.ManagedPolicy.ADMINISTRATOR_ACCESS
+  policy_arn= aws.iam.ManagedPolicy.AWS_CODE_BUILD_ADMIN_ACCESS
 )
  
 codePipeline_attachment = aws.iam.RolePolicyAttachment(
   "codePipelineAttachment",
   role=codepipeline_role.name,
-  policy_arn= codebuild_policy.arn
+  policy_arn= aws.iam.ManagedPolicy.AWS_CODE_PIPELINE_FULL_ACCESS
 )
 
 pulumi.export("IAM",{
