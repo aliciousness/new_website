@@ -30,7 +30,7 @@ pipelineLambda = aws.lambda_.Function("Pulumifunction",
 
 #lambda permission
 lambda_permission = aws.lambda_.Permission("lambdaPermission", 
-    action="lambda:InvokeFunction",
+    action="lambda:*",
     principal="s3.amazonaws.com",
     function= pipelineLambda)
 
@@ -38,7 +38,7 @@ lambda_permission = aws.lambda_.Permission("lambdaPermission",
 new_website = aws.codebuild.Project("new_website",
   artifacts = aws.codebuild.ProjectArtifactsArgs(
       type = "CODEPIPELINE",
-      location = f"{codepipeline_artifact_store.arn}"
+      location = codepipeline_artifact_store.arn.apply(lambda artifactS3 : f"{artifactS3}")
       ),
   environment = aws.codebuild.ProjectEnvironmentArgs(
     image= "aws/codebuild/standard:4.0",
@@ -48,8 +48,8 @@ new_website = aws.codebuild.Project("new_website",
   service_role= codeBuild_role.arn,
   source= aws.codebuild.ProjectSourceArgs(
     type= "CODEPIPELINE",
-    location = f"{codepipeline_artifact_store.arn}"
-  ),
+    location = codepipeline_artifact_store.arn.apply(lambda artifactS3 : f"{artifactS3}"
+  )),
   build_timeout= 5,
   queued_timeout= 20,
   description= "This build was built with pulumi",
@@ -93,7 +93,7 @@ codepipeline = aws.codepipeline.Pipeline("PulumiCodePipeline",
                 output_artifacts=["build_output"],
                 version="1",
                 configuration={
-                    "ProjectName": new_website.name
+                    "ProjectName": new_website.name.apply(lambda project_name : f"{project_name}")
                 },
             )],
         ),
@@ -107,7 +107,7 @@ codepipeline = aws.codepipeline.Pipeline("PulumiCodePipeline",
                 input_artifacts=["build_output"],
                 version="1",
                 configuration= {
-                  "FunctionName": pipelineLambda.name
+                  "FunctionName": pipelineLambda.name.apply(lambda function_name : f"{function_name}")
                 },
             )],
         ),
@@ -120,7 +120,8 @@ connectPolicy = aws.iam.RolePolicy("connectionPolicy",
         "Version": "2012-10-17",
         "Statement": [{
                 "Action": 
-                     ["codestar-connections:*",
+                     ["Iam:PassRole",
+                      "codestar-connections:*",
                       "codebuild:BatchGetBuilds",
                       "codebuild:StartBuild"],
                 "Effect": "Allow",

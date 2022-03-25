@@ -87,7 +87,9 @@ codebuild_policy = aws.iam.Policy("NewWebsiteCodebuild",
                 "codebuild:CreateReport",
                 "codebuild:UpdateReport",
                 "codebuild:BatchPutTestCases",
-                "codebuild:BatchPutCodeCoverages"
+                "codebuild:BatchPutCodeCoverages",
+                "codebuild:BatchGetBuilds",
+                "codebuild:StartBuild"
             ],
             "Resource": [
                 "arn:aws:codebuild:us-east-2:037484876593:report-group/new_website-*"
@@ -102,14 +104,9 @@ role_policy_attachment = aws.iam.RolePolicyAttachment("lambdaRoleAttachment",
 
 
 codeBuild_attachment = aws.iam.RolePolicyAttachment(
-  "codebuildAttachment1",
-  role=codeBuild_role.name,
-  policy_arn= codebuild_policy.arn,
-)
-codeBuild_attachment = aws.iam.RolePolicyAttachment(
   "codebuildAttachment2",
   role=codeBuild_role.name,
-  policy_arn= aws.iam.ManagedPolicy.AWS_CODE_BUILD_ADMIN_ACCESS
+  policy_arn= aws.iam.ManagedPolicy.ADMINISTRATOR_ACCESS
 )
  
 codePipeline_attachment = aws.iam.RolePolicyAttachment(
