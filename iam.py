@@ -95,64 +95,27 @@ codebuild_policy = aws.iam.Policy("NewWebsiteCodebuild",
         }}
     ]
 }}'''))
-codepipeline_policy = aws.iam.Policy("pipeline_policy",
-                                     policy=codepipeline_artifact_store.arn.apply(lambda artifactS3 : f"""{{
-    "Version": "2012-10-17",
-    "Statement": [
-        {{
-            "Effect": "Allow",
-            "Resource": [
-                "*"
-            ],
-            "Action": [
-                "logs:CreateLogGroup",
-                "logs:CreateLogStream",
-                "logs:PutLogEvents"
-            ]
-        }},
-        {{
-            "Effect": "Allow",
-            "Resource": [
-                "{artifactS3}"
-            ],
-            "Action": [
-                "s3:PutObject",
-                "s3:GetObject",
-                "s3:GetObjectVersion",
-                "s3:GetBucketAcl",
-                "s3:GetBucketLocation"
-            ]
-        }},
-        {{
-            "Effect": "Allow",
-            "Action": [
-                "codebuild:CreateReportGroup",
-                "codebuild:CreateReport",
-                "codebuild:UpdateReport",
-                "codebuild:BatchPutTestCases",
-                "codebuild:BatchPutCodeCoverages"
-            ],
-            "Resource": [
-                "arn:aws:codebuild:us-east-1:037484876593:report-group/new_website-8a91cb9-*"
-            ]
-        }}
-    ]
-}}"""))
+
 role_policy_attachment = aws.iam.RolePolicyAttachment("lambdaRoleAttachment",
     role=lambdarole.name, 
     policy_arn=aws.iam.ManagedPolicy.LAMBDA_FULL_ACCESS)
 
 
 codeBuild_attachment = aws.iam.RolePolicyAttachment(
-  "codebuildAttachment",
+  "codebuildAttachment1",
   role=codeBuild_role.name,
-  policy_arn= codebuild_policy.arn
+  policy_arn= codebuild_policy.arn,
+)
+codeBuild_attachment = aws.iam.RolePolicyAttachment(
+  "codebuildAttachment2",
+  role=codeBuild_role.name,
+  policy_arn= aws.iam.ManagedPolicy.ADMINISTRATOR_ACCESS
 )
 
 codePipeline_attachment = aws.iam.RolePolicyAttachment(
   "codePipelineAttachment",
   role=codepipeline_role.name,
-  policy_arn= codepipeline_policy.arn
+  policy_arn= codebuild_policy.arn
 )
 
 pulumi.export("IAM",{
