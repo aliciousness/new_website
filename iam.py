@@ -111,7 +111,7 @@ codeBuild_attachment = aws.iam.RolePolicyAttachment(
   role=codeBuild_role.name,
   policy_arn= aws.iam.ManagedPolicy.ADMINISTRATOR_ACCESS
 )
-
+ 
 codePipeline_attachment = aws.iam.RolePolicyAttachment(
   "codePipelineAttachment",
   role=codepipeline_role.name,

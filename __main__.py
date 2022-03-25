@@ -38,7 +38,7 @@ lambda_permission = aws.lambda_.Permission("lambdaPermission",
 new_website = aws.codebuild.Project("new_website",
   artifacts = aws.codebuild.ProjectArtifactsArgs(
       type = "CODEPIPELINE",
-      location = "https://github.com/aliciousness/new_website"
+      location = f"{codepipeline_artifact_store.arn}"
       ),
   environment = aws.codebuild.ProjectEnvironmentArgs(
     image= "aws/codebuild/standard:4.0",
@@ -48,7 +48,7 @@ new_website = aws.codebuild.Project("new_website",
   service_role= codeBuild_role.arn,
   source= aws.codebuild.ProjectSourceArgs(
     type= "CODEPIPELINE",
-    location = "https://github.com/aliciousness/new_website"
+    location = f"{codepipeline_artifact_store.arn}"
   ),
   build_timeout= 5,
   queued_timeout= 20,
