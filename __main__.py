@@ -7,14 +7,12 @@ from iam import *
 connection = aws.codestarconnections.Connection(
     "github_connection", 
     provider_type="GitHub")
-#bucket for the build to zip all the files
-codepipeline_zipped = aws.s3.Bucket("codepipelineBucketZipped")
+#bucket for the build to zip all the files, also have to go to the console to get bucket full name for buildspec bucket location 
+codepipeline_zipped = aws.s3.Bucket("codepipelinebucketzipped")
 
 
 #bucket for lambda to put unzipped artifacts 
-lambda_bucket = aws.s3.Bucket("codepipelinePulumi", 
-                             
-                              )
+lambda_bucket = aws.s3.Bucket("codepipelinePulumi",)
 
 #kms key
 s3kmskey = aws.kms.Key("key",
@@ -45,7 +43,11 @@ new_website = aws.codebuild.Project("new_website",
   environment = aws.codebuild.ProjectEnvironmentArgs(
     image= "aws/codebuild/standard/3.0",
     type = "LINUX_GPU_CONTAINER",
-    compute_type= "BUILD_GENERAL1_LARGE"
+    compute_type= "BUILD_GENERAL1_LARGE",
+    environment_variables= aws.codebuild.ProjectEnvironmentEnvironmentVariableArgs(
+        name= "S3",
+        value= codepipeline_zipped._name
+    )
   ),
   service_role= codeBuild_role.arn,
   source= aws.codebuild.ProjectSourceArgs(

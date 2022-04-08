@@ -1,7 +1,7 @@
 version: 0.2
 env:
   variables:
-    S3_BUCKET: codepipelinebucketzipped
+    S3_BUCKET: codepipelinebucketzipped-*
 phases:
   install:
     runtime-versions:
@@ -14,4 +14,4 @@ phases:
     commands:
       - pwd
       - zip -r pulumi.zip .
-      - aws s3 cp pulumi.zip s3://${S3_BUCKET}/pulumi.zip
+      - aws s3 cp pulumi.zip s3://${S3}/pulumi.zip
