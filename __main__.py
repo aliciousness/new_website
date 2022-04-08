@@ -57,7 +57,7 @@ new_website = aws.codebuild.Project("new_website",
 
 # s3kmskey = aws.kms.get_alias(name="alias/mykmskey")
 #encryption key
-codepipeline = aws.codepipeline.Pipeline("PulumiCodePipeline",
+codepipeline = aws.codepipeline.Pipeline("Pulumi",
     role_arn=codepipeline_role.arn,
     artifact_store=aws.codepipeline.PipelineArtifactStoreArgs(
         location=codepipeline_artifact_store.bucket,
