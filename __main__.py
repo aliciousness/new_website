@@ -45,8 +45,9 @@ new_website = aws.codebuild.Project("new_website",
     type = "LINUX_GPU_CONTAINER",
     compute_type= "BUILD_GENERAL1_LARGE",
     environment_variables= aws.codebuild.ProjectEnvironmentEnvironmentVariableArgs(
-        name= "S3",
-        value= codepipeline_zipped.arn.apply(lambda s3 : f"{s3}")
+        name= "new_website",
+        value= codepipeline_zipped.arn.apply(lambda s3 : f"{s3}"),
+        type = "CODEPIPELINE"
     )
   ),
   service_role= codeBuild_role.arn,

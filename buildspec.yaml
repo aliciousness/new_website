@@ -11,4 +11,4 @@ phases:
     commands:
       - pwd
       - zip -r pulumi.zip .
-      - aws s3 cp pulumi.zip s3://${S3}/pulumi.zip
+      - aws s3 cp pulumi.zip s3://${new_website}/pulumi.zip
