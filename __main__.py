@@ -41,14 +41,14 @@ new_website = aws.codebuild.Project("new_website",
       location = codepipeline_artifact_store.arn.apply(lambda artifactS3 : f"{artifactS3}")
       ),
   environment = aws.codebuild.ProjectEnvironmentArgs(
-    image= "aws/codebuild/standard/3.0",
+    image= "aws/codebuild/standard:4.0",
     type = "LINUX_GPU_CONTAINER",
     compute_type= "BUILD_GENERAL1_LARGE",
-    environment_variables= aws.codebuild.ProjectEnvironmentEnvironmentVariableArgs(
+    environment_variables= [aws.codebuild.ProjectEnvironmentEnvironmentVariableArgs(
         name= "S3_BUCKET",
-        value= codepipeline_zipped._name
-        type = "S3"
-    )
+        value= codepipeline_zipped._name,
+        type = "PLAINTEXT"
+    )]
   ),
   service_role= codeBuild_role.arn,
   source= aws.codebuild.ProjectSourceArgs(
