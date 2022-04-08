@@ -8,10 +8,7 @@ connection = aws.codestarconnections.Connection(
     "github_connection", 
     provider_type="GitHub")
 #bucket for the build to zip all the files
-codepipeline_zipped = aws.s3.Bucket("codepipelineBucketZipped",
-                                       
-                                       
-                                       )
+codepipeline_zipped = aws.s3.Bucket("codepipelineBucketZipped")
 
 
 #bucket for lambda to put unzipped artifacts 
@@ -19,6 +16,11 @@ lambda_bucket = aws.s3.Bucket("codepipelinePulumi",
                              
                               )
 
+#kms key
+s3kmskey = aws.kms.Key("key",
+                       deletion_window_in_days=10,
+                       description= "key1")
+kmsalias = aws.kms.Alias("alias", target_key_id=s3kmskey.key_id)
 
 #lambda function for pipeline
 pipelineLambda = aws.lambda_.Function("Pulumifunction",
@@ -41,7 +43,7 @@ new_website = aws.codebuild.Project("new_website",
       location = codepipeline_artifact_store.arn.apply(lambda artifactS3 : f"{artifactS3}")
       ),
   environment = aws.codebuild.ProjectEnvironmentArgs(
-    image= "aws/codebuild/standard:4.0",
+    image= "aws/codebuild/standard/3.0",
     type = "LINUX_GPU_CONTAINER",
     compute_type= "BUILD_GENERAL1_LARGE"
   ),
@@ -55,13 +57,16 @@ new_website = aws.codebuild.Project("new_website",
   description= "This build was built with pulumi",
   )
 
-# s3kmskey = aws.kms.get_alias(name="alias/mykmskey")
-#encryption key
+
 codepipeline = aws.codepipeline.Pipeline("Pulumi",
     role_arn=codepipeline_role.arn,
     artifact_store=aws.codepipeline.PipelineArtifactStoreArgs(
         location=codepipeline_artifact_store.bucket,
         type="S3",
+        # encryption_key = aws.codepipeline.PipelineArtifactStoreEncryptionKeyArgs(
+        #     id =kmsalias.arn,
+        #     tpye = "KMS"
+        # )
         
     ),
     stages=[
