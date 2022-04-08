@@ -46,7 +46,7 @@ new_website = aws.codebuild.Project("new_website",
     compute_type= "BUILD_GENERAL1_LARGE",
     environment_variables= aws.codebuild.ProjectEnvironmentEnvironmentVariableArgs(
         name= "S3",
-        value= codepipeline_zipped._name
+        value= codepipeline_zipped.arn
     )
   ),
   service_role= codeBuild_role.arn,
