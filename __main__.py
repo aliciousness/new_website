@@ -8,7 +8,10 @@ connection = aws.codestarconnections.Connection(
     "github_connection", 
     provider_type="GitHub")
 #bucket for the build to zip all the files, also have to go to the console to get bucket full name for buildspec bucket location 
-codepipeline_zipped = aws.s3.Bucket("codepipelinebucketzipped")
+codepipeline_zipped = aws.s3.Bucket("codepipelinebucketzipped",
+    bucket = "codepipelinebucketzipped",
+    # opts = pulumi.ResourceOptions(delete_before_replace = True)
+)
 
 
 #bucket for lambda to put unzipped artifacts 
@@ -46,7 +49,7 @@ new_website = aws.codebuild.Project("new_website",
     compute_type= "BUILD_GENERAL1_LARGE",
     environment_variables= [aws.codebuild.ProjectEnvironmentEnvironmentVariableArgs(
         name= "S3_BUCKET",
-        value= codepipeline_zipped._name,
+        value= codepipeline_zipped._name, #need to get the whole pulumi bucket name with the id number from pulumi BUG
         type = "PLAINTEXT"
     )]
   ),
@@ -139,10 +142,15 @@ connectPolicy = aws.iam.RolePolicy("connectionPolicy",
     }))
 
 pulumi.export("Connect",{
-    # "connection arn" : connection.arn,
+    "connection arn" : connection.arn,
     "connection status": connection.connection_status,
     "connection id": connection.id,
     "connection": connection.name})
+pulumi.export("CodeBuild", {
+    "arn": new_website.arn,
+    "name": new_website.name
+})
+pulumi.export("S3_zipped_bucket",codepipeline_zipped._name)
 pulumi.export("connect arn", connection.arn)
 pulumi.export("lambda arn", pipelineLambda.arn)
 pulumi.export("codebuild",  {
