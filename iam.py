@@ -77,7 +77,15 @@ codebuild_policy = aws.iam.Policy("NewWebsiteCodebuild",
                 "s3:GetObject",
                 "s3:GetObjectVersion",
                 "s3:GetBucketAcl",
-                "s3:GetBucketLocation",
+                "s3:GetBucketLocation"
+            ]
+        }},
+        {{
+            "Effect": "Allow",
+            "Resource": [
+                "*"
+            ],
+            "Action": [
                 "lambda:*"
             ]
         }},
@@ -99,6 +107,21 @@ codebuild_policy = aws.iam.Policy("NewWebsiteCodebuild",
     ]
 }}'''))
 
+connectPolicy = aws.iam.RolePolicy("connectionPolicy",
+  role = codepipeline_role.id,
+  policy = json.dumps({
+        "Version": "2012-10-17",
+        "Statement": [{
+                "Action": 
+                     ["Iam:PassRole",
+                      "codestar-connections:*",
+                      "codebuild:BatchGetBuilds",
+                      "codebuild:StartBuild"],
+                "Effect": "Allow",
+                "Resource":"*",
+                
+            }]
+    }))
 
 role_policy_attachment = aws.iam.RolePolicyAttachment("lambdaRoleAttachment",
     role=lambdarole.name, 

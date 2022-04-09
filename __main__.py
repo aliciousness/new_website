@@ -59,7 +59,7 @@ new_website = aws.codebuild.Project("new_website",
     location = codepipeline_artifact_store.arn.apply(lambda artifactS3 : f"{artifactS3}"
   )),
   build_timeout= 5,
-  queued_timeout= 10,
+  queued_timeout= 20,
   description= "This build was built with pulumi",
   )
 
@@ -125,21 +125,6 @@ codepipeline = aws.codepipeline.Pipeline("Pulumi",
     ])
 
 
-connectPolicy = aws.iam.RolePolicy("connectionPolicy",
-  role = codepipeline_role.id,
-  policy = json.dumps({
-        "Version": "2012-10-17",
-        "Statement": [{
-                "Action": 
-                     ["Iam:PassRole",
-                      "codestar-connections:*",
-                      "codebuild:BatchGetBuilds",
-                      "codebuild:StartBuild"],
-                "Effect": "Allow",
-                "Resource":"*",
-                
-            }]
-    }))
 
 pulumi.export("Connect",{
     "connection arn" : connection.arn,
