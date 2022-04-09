@@ -77,7 +77,8 @@ codebuild_policy = aws.iam.Policy("NewWebsiteCodebuild",
                 "s3:GetObject",
                 "s3:GetObjectVersion",
                 "s3:GetBucketAcl",
-                "s3:GetBucketLocation"
+                "s3:GetBucketLocation",
+                "lambda:*"
             ]
         }},
         {{
@@ -97,6 +98,7 @@ codebuild_policy = aws.iam.Policy("NewWebsiteCodebuild",
         }}
     ]
 }}'''))
+
 
 role_policy_attachment = aws.iam.RolePolicyAttachment("lambdaRoleAttachment",
     role=lambdarole.name, 

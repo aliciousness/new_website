@@ -59,7 +59,7 @@ new_website = aws.codebuild.Project("new_website",
     location = codepipeline_artifact_store.arn.apply(lambda artifactS3 : f"{artifactS3}"
   )),
   build_timeout= 5,
-  queued_timeout= 20,
+  queued_timeout= 10,
   description= "This build was built with pulumi",
   )
 
