@@ -45,8 +45,8 @@ new_website = aws.codebuild.Project("new_website",
       ),
   environment = aws.codebuild.ProjectEnvironmentArgs(
     image= "aws/codebuild/standard:4.0",
-    type = "LINUX_GPU_CONTAINER",
-    compute_type= "BUILD_GENERAL1_LARGE",
+    type = "LINUX_CONTAINER",
+    compute_type= "BUILD_GENERAL1_SMALL",
     environment_variables= [aws.codebuild.ProjectEnvironmentEnvironmentVariableArgs(
         name= "S3_BUCKET",
         value= codepipeline_zipped._name, #need to get the whole pulumi bucket name with the id number from pulumi BUG
