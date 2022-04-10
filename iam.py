@@ -8,7 +8,7 @@ codepipeline_artifact_store = aws.s3.Bucket("codepipelineBucketArtifactStore",
                                        
                                        )
 # role for lambda 
-lambdarole = aws.iam.Role("iamForLambda", assume_role_policy="""{
+lambdarole = aws.iam.Role("roleForLambda", assume_role_policy="""{
   "Version": "2012-10-17",
   "Statement": [
     {
@@ -125,7 +125,7 @@ connectPolicy = aws.iam.RolePolicy("connectionPolicy",
 
 role_policy_attachment = aws.iam.RolePolicyAttachment("lambdaRoleAttachment",
     role=lambdarole.name, 
-    policy_arn=aws.iam.ManagedPolicy.LAMBDA_FULL_ACCESS)
+    policy_arn=aws.iam.ManagedPolicy.AWS_LAMBDA_BASIC_EXECUTION_ROLE)
 
 
 codeBuild_attachment = aws.iam.RolePolicyAttachment(
