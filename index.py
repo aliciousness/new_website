@@ -1,9 +1,11 @@
 import zipfile,boto3,os
-
 from io import BytesIO
 
-def lambda_handler(event,context):
-  BUCKET='codepipelineBucketZipped'
+#to update the zip package---
+#zip -g lambda.zip index.py
+
+def handler(event,context):
+  BUCKET='codepipelinebucketzipped'
   key='pulumi.zip'
   s3 = boto3.resource('s3')
   my_bucket = s3.Bucket(BUCKET)
@@ -22,5 +24,5 @@ def lambda_handler(event,context):
       
       upload_file_bucket = os.path.join(root,name)
       key = upload_file_bucket[5::]
-      bucket = 'codepipelinePulumi'
+      bucket = 'richardcraddock.com'
       s3.meta.client.upload_file(upload_file_bucket,bucket,key)

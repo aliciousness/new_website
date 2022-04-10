@@ -7,15 +7,11 @@ from iam import *
 connection = aws.codestarconnections.Connection(
     "github_connection", 
     provider_type="GitHub")
-#bucket for the build to zip all the files, also have to go to the console to get bucket full name for buildspec bucket location 
-codepipeline_zipped = aws.s3.Bucket("codepipelinebucketzipped",
-    bucket = "codepipelinebucketzipped",
-    # opts = pulumi.ResourceOptions(delete_before_replace = True)
-)
 
 
-#bucket for lambda to put unzipped artifacts 
-lambda_bucket = aws.s3.Bucket("codepipelinePulumi",)
+
+
+
 
 #kms key
 s3kmskey = aws.kms.Key("key",
@@ -28,7 +24,7 @@ pipelineLambda = aws.lambda_.Function("Pulumifunction",
   code = pulumi.FileArchive("./lambda.zip"),
   role = lambdarole.arn,
   runtime = "python3.8",
-  handler = "index.test"
+  handler = "index.handler"
 )
 
 #lambda permission
