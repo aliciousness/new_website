@@ -31,4 +31,5 @@ def handler(event,context):
       bucket = 'richardcraddock.com'
       s3.meta.client.upload_file(upload_file_bucket,bucket,combo)
   
-  print("Success")
+  return "SUCCESS"
+  
