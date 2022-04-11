@@ -24,7 +24,8 @@ pipelineLambda = aws.lambda_.Function("Pulumifunction",
   code = pulumi.FileArchive("./lambda.zip"),
   role = lambdarole.arn,
   runtime = "python3.8",
-  handler = "index.handler"
+  handler = "index.handler",
+  timeout= 60
 #   environment = 
 )
 
