@@ -68,8 +68,10 @@ lambda_policy = aws.iam.Policy('LambdaPolicyWebsite',
             "Effect": "Allow",
             "Action": "s3:*",
             "Resource": [
-                "{zippeds3+"/*",
-                zippeds3,"arn:aws:s3:::codepipelinebucketzipped"}" 
+                "{zippeds3+"/*"}",
+                "{zippeds3}",
+                "arn:aws:s3:::codepipelineunbucketzipped"
+               
     ]
         }},
         {{
@@ -118,7 +120,7 @@ codebuild_policy = aws.iam.Policy("NewWebsiteCodebuild",
                 "*"
             ],
             "Action": [
-                "lambda:*"
+                "lambda:InvokeFunction"
             ]
         }},
         {{

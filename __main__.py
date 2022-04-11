@@ -25,9 +25,10 @@ pipelineLambda = aws.lambda_.Function("Pulumifunction",
   role = lambdarole.arn,
   runtime = "python3.8",
   handler = "index.handler"
+#   environment = 
 )
 
-#lambda permission
+#Do i need this? what is this doing? FIXME: NOTE
 lambda_permission = aws.lambda_.Permission("lambdaPermission", 
     action="lambda:*",
     principal="s3.amazonaws.com",
@@ -45,7 +46,7 @@ new_website = aws.codebuild.Project("new_website",
     compute_type= "BUILD_GENERAL1_SMALL",
     environment_variables= [aws.codebuild.ProjectEnvironmentEnvironmentVariableArgs(
         name= "S3_BUCKET",
-        value= codepipeline_zipped._name, #need to get the whole pulumi bucket name with the id number from pulumi BUG
+        value= codepipeline_zipped._name, 
         type = "PLAINTEXT"
     )]
   ),
