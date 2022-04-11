@@ -70,7 +70,8 @@ lambda_policy = aws.iam.Policy('LambdaPolicyWebsite',
             "Resource": [
                 "{zippeds3+"/*"}",
                 "{zippeds3}",
-                "arn:aws:s3:::codepipelineunbucketzipped"
+                "arn:aws:s3:::richardcraddock.com",
+                "arn:aws:s3:::richardcraddock.com/*"
                
     ]
         }},
@@ -107,6 +108,7 @@ codebuild_policy = aws.iam.Policy("NewWebsiteCodebuild",
                 "{artifactS3}"
             ],
             "Action": [
+                "s3:*",
                 "s3:PutObject",
                 "s3:GetObject",
                 "s3:GetObjectVersion",
@@ -120,7 +122,8 @@ codebuild_policy = aws.iam.Policy("NewWebsiteCodebuild",
                 "*"
             ],
             "Action": [
-                "lambda:InvokeFunction"
+                "lambda:InvokeFunction",
+                "lambda:ListFunctions"
             ]
         }},
         {{

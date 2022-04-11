@@ -25,7 +25,7 @@ pipelineLambda = aws.lambda_.Function("Pulumifunction",
   role = lambdarole.arn,
   runtime = "python3.8",
   handler = "index.handler",
-  timeout= 60
+  timeout= 30
 #   environment = 
 )
 
@@ -67,11 +67,6 @@ codepipeline = aws.codepipeline.Pipeline("Pulumi",
     artifact_store=aws.codepipeline.PipelineArtifactStoreArgs(
         location=codepipeline_artifact_store.bucket,
         type="S3",
-        # encryption_key = aws.codepipeline.PipelineArtifactStoreEncryptionKeyArgs(
-        #     id =kmsalias.arn,
-        #     tpye = "KMS"
-        # )
-        
     ),
     stages=[
         aws.codepipeline.PipelineStageArgs(
@@ -85,7 +80,7 @@ codepipeline = aws.codepipeline.Pipeline("Pulumi",
                 output_artifacts=["source_output"],
                 configuration={
                     "ConnectionArn": connection.arn,
-                    "FullRepositoryId": "aliciousness/new_website",
+                    "FullRepositoryId": "aliciousness/resume",
                     "BranchName": "main",
                     
                 },
