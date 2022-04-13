@@ -76,6 +76,18 @@ lambda_policy = aws.iam.Policy('LambdaPolicyWebsite',
     ]
         }},
         {{
+          "Effect": "Allow",
+            "Action": [
+                "codepipeline:GetPipeline",
+                "codepipeline:GetPipelineState",
+                "codepipeline:GetPipelineExecution",
+                "codepipeline:ListPipelineExecutions",
+                "codepipeline:ListPipelines",
+                "codepipeline:PutApprovalResult"
+            ],
+            "Resource": "arn:aws:codepipeline:us-east-1:037484876593:Pulumi-*"
+        }},
+        {{
             "Effect": "Allow",
             "Action": [
                 "logs:CreateLogGroup",
@@ -93,8 +105,8 @@ codebuild_policy = aws.iam.Policy("NewWebsiteCodebuild",
         {{
             "Effect": "Allow",
             "Resource": [
-                "arn:aws:logs:us-east-2:037484876593:log-group:/aws/codebuild/new_website-8a91cb9",
-                "arn:aws:logs:us-east-2:037484876593:log-group:/aws/codebuild/new_website-8a91cb9:*"
+                "arn:aws:logs:us-east-2:037484876593:log-group:/aws/codebuild/new_website-*",
+                "arn:aws:logs:us-east-2:037484876593:log-group:/aws/codebuild/new_website-*:*"
             ],
             "Action": [
                 "logs:CreateLogGroup",
