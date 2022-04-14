@@ -11,10 +11,6 @@ codepipeline_zipped = aws.s3.Bucket("codepipelinebucketzipped",
                                     # opts = pulumi.ResourceOptions(delete_before_replace = True)
 )
 
-#bucket for lambda to put unzipped artifacts 
-lambda_bucket = aws.s3.Bucket("codepipelinebucketunzipped",
-                              bucket = "richardcraddock.com")
-
 # role for lambda 
 lambdarole = aws.iam.Role("roleForLambda", assume_role_policy="""{
   "Version": "2012-10-17",
@@ -70,8 +66,8 @@ lambda_policy = aws.iam.Policy('LambdaPolicyWebsite',
             "Resource": [
                 "{zippeds3+"/*"}",
                 "{zippeds3}",
-                "arn:aws:s3:::richardcraddock.com",
-                "arn:aws:s3:::richardcraddock.com/*"
+                "arn:aws:s3:::richardcraddock.me",
+                "arn:aws:s3:::richardcraddock.me/*"
                
     ]
         }},

@@ -6,7 +6,7 @@ from io import BytesIO
 #zip -g lambda.zip index.py
 print('Initialising')
 BUCKET='codepipelinebucketzipped'
-key='pulumi.zip'
+key='resume.zip'
 s3 = boto3.resource('s3')
 my_bucket = s3.Bucket(BUCKET)
 
@@ -28,7 +28,7 @@ def handler(event,context):
       upload_file_bucket = os.path.join(root,name)
       combo = upload_file_bucket[5::]
       print(f"file {combo} added to bucket")
-      bucket = 'richardcraddock.com'
+      bucket = 'richardcraddock.me'
       s3.meta.client.upload_file(upload_file_bucket,bucket,combo)
   
   return "SUCCESS"

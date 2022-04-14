@@ -1,4 +1,5 @@
 """An AWS Python Pulumi program"""
+from ast import alias
 import pulumi, json
 import pulumi_aws as aws
 from iam import *
@@ -9,7 +10,57 @@ connection = aws.codestarconnections.Connection(
     provider_type="GitHub")
 
 
+#find aws hosted zone
+zone = aws.route53.get_zone(
+                               name = "richardcraddock.me",
+                               private_zone= False,
+                               tags= {
+                                 "Name": "Pulumi_resume"
+                               }
+                               )
 
+
+#website buckets 
+website_buckets = []
+
+  #bucket for lambda
+lambda_bucket = aws.s3.Bucket("richardcraddock.me",
+                              bucket = "richardcraddock.me",  #need to change bucket name to .me and change it in the lambda and zip it up 
+                              acl= "public-read",
+                              hosted_zone_id= zone.zone_id,
+                              website_domain= "richardcraddock.me",
+                              website_endpoint= "richardcraddock.me",
+                              website=aws.s3.BucketWebsiteArgs(
+                                index_document="index.html",
+                                error_document = "error.html"
+                              ))
+website_buckets.append(lambda_bucket)
+  #bucket for redirect for www
+www_bucket = aws.s3.Bucket("www.richardcraddock.me",
+                           bucket= "www.richardcraddock.me",
+                           website_domain= "www.richardcraddock.me",
+                           website_endpoint= "www.richardcraddock.me",
+                           hosted_zone_id= zone.zone_id,
+                           website= aws.s3.BucketWebsiteArgs(
+                             redirect_all_requests_to= "richardcraddock.me"
+                           ))
+website_buckets.append(www_bucket)
+
+# def record():
+#   for a in website_buckets:
+#     aws.route53.Record(f"{a.bucket}",
+#                        name = a.bucket_domain_name,
+#                        type = aws.route53.RecordType("A"),
+#                        zone_id = zone.zone_id,
+#                        aliases= [
+#                            aws.route53.RecordAliasArgs(
+#                                evaluate_target_health= True,
+#                                name= a.bucket_domain_name,
+#                                zone_id=zone.zone_id
+#                        )]
+#                        )
+
+# record()
 
 
 
