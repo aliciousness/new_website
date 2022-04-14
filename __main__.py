@@ -28,8 +28,7 @@ lambda_bucket = aws.s3.Bucket("richardcraddock.me",
                               bucket = "richardcraddock.me",  #need to change bucket name to .me and change it in the lambda and zip it up 
                               acl= "public-read",
                               hosted_zone_id= zone.zone_id,
-                              website_domain= "richardcraddock.me",
-                              website_endpoint= "richardcraddock.me",
+                              website_domain= "http://richardcraddock.me",
                               website=aws.s3.BucketWebsiteArgs(
                                 index_document="index.html",
                                 error_document = "error.html"
@@ -38,29 +37,25 @@ website_buckets.append(lambda_bucket)
   #bucket for redirect for www
 www_bucket = aws.s3.Bucket("www.richardcraddock.me",
                            bucket= "www.richardcraddock.me",
-                           website_domain= "www.richardcraddock.me",
-                           website_endpoint= "www.richardcraddock.me",
-                           hosted_zone_id= zone.zone_id,
                            website= aws.s3.BucketWebsiteArgs(
-                             redirect_all_requests_to= "richardcraddock.me"
+                             redirect_all_requests_to= "http://richardcraddock.me"
                            ))
 website_buckets.append(www_bucket)
 
-# def record():
-#   for a in website_buckets:
-#     aws.route53.Record(f"{a.bucket}",
-#                        name = a.bucket_domain_name,
-#                        type = aws.route53.RecordType("A"),
-#                        zone_id = zone.zone_id,
-#                        aliases= [
-#                            aws.route53.RecordAliasArgs(
-#                                evaluate_target_health= True,
-#                                name= a.bucket_domain_name,
-#                                zone_id=zone.zone_id
-#                        )]
-#                        )
 
-# record()
+aws.route53.Record(f"{www_bucket.bucket}",
+                       name = "",
+                       type = aws.route53.RecordType("A"),
+                       zone_id = zone.zone_id,
+                       aliases= [
+                           aws.route53.RecordAliasArgs(
+                               evaluate_target_health= True,
+                               name= lambda_bucket.website_domain,
+                               zone_id=zone.zone_id
+                       )]
+                       )
+
+
 
 
 
