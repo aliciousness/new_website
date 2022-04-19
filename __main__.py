@@ -20,66 +20,59 @@ zone = aws.route53.get_zone(
                                )
 
 
-#website buckets 
-website_buckets = []
 
-  #bucket for lambda
-lambda_bucket = aws.s3.Bucket("richardcraddock.me",
-                              bucket = "richardcraddock.me",  #need to change bucket name to .me and change it in the lambda and zip it up 
-                              acl= "public-read",
-                              hosted_zone_id= zone.zone_id,
-                              website_domain= "http://richardcraddock.me",
-                              website=aws.s3.BucketWebsiteArgs(
-                                index_document="index.html",
-                                error_document = "error.html"
-                              ))
-website_buckets.append(lambda_bucket)
-  #bucket for redirect for www
-www_bucket = aws.s3.Bucket("www.richardcraddock.me",
-                           bucket= "www.richardcraddock.me",
-                           website= aws.s3.BucketWebsiteArgs(
-                             redirect_all_requests_to= "http://richardcraddock.me"
-                           ))
-website_buckets.append(www_bucket)
+cert = aws.acm.Certificate("resume_cert",
+                           domain_name = "richardcraddock.me",
+                           tags={
+                             "Environment": "richardcraddock.me"
+                           },
+                           validation_method="DNS")
+
+cert = aws.acm.Certificate("www_resume_cert",
+                           domain_name = "www.richardcraddock.me",
+                           tags={
+                             "Environment": "www.richardcraddock.me"
+                           },
+                           validation_method="DNS")
 
 
-aws.route53.Record(f"{www_bucket.bucket}",
-                       name = "",
-                       type = aws.route53.RecordType("A"),
-                       zone_id = zone.zone_id,
-                       aliases= [
-                           aws.route53.RecordAliasArgs(
-                               evaluate_target_health= True,
-                               name= lambda_bucket.website_domain,
-                               zone_id=zone.zone_id
-                       )]
-                       )
+# aws.route53.Record(f"{www_bucket.bucket}",
+#                        name = "www.richardcraddock.com",
+#                        type = aws.route53.RecordType("A"),
+#                        zone_id = zone.zone_id,
+#                        aliases= [
+#                            aws.route53.RecordAliasArgs(
+#                                evaluate_target_health= False,
+#                                name= lambda_bucket.website_domain,
+#                                zone_id=zone.zone_id
+#                        )]
+#                        )
 
 
 
 
 
 #kms key
-s3kmskey = aws.kms.Key("key",
-                       deletion_window_in_days=10,
-                       description= "key1")
-kmsalias = aws.kms.Alias("alias", target_key_id=s3kmskey.key_id)
+# s3kmskey = aws.kms.Key("key",
+#                        deletion_window_in_days=10,
+#                        description= "key1")
+# kmsalias = aws.kms.Alias("alias", target_key_id=s3kmskey.key_id)
 
 #lambda function for pipeline
-pipelineLambda = aws.lambda_.Function("Pulumifunction",
-  code = pulumi.FileArchive("./lambda.zip"),
-  role = lambdarole.arn,
-  runtime = "python3.8",
-  handler = "index.handler",
-  timeout= 30
-#   environment = 
-)
+# pipelineLambda = aws.lambda_.Function("Pulumifunction",
+#   code = pulumi.FileArchive("./lambda.zip"),
+#   role = lambdarole.arn,
+#   runtime = "python3.8",
+#   handler = "index.handler",
+#   timeout= 30
+# #   environment = 
+# )
 
-#Do i need this? what is this doing? FIXME: NOTE
-lambda_permission = aws.lambda_.Permission("lambdaPermission", 
-    action="lambda:*",
-    principal="s3.amazonaws.com",
-    function= pipelineLambda)
+# #Do i need this? what is this doing? FIXME: NOTE
+# lambda_permission = aws.lambda_.Permission("lambdaPermission", 
+#     action="lambda:*",
+#     principal="s3.amazonaws.com",
+#     function= pipelineLambda)
 
 #codebuild project
 new_website = aws.codebuild.Project("new_website",
@@ -93,7 +86,7 @@ new_website = aws.codebuild.Project("new_website",
     compute_type= "BUILD_GENERAL1_SMALL",
     environment_variables= [aws.codebuild.ProjectEnvironmentEnvironmentVariableArgs(
         name= "S3_BUCKET",
-        value= codepipeline_zipped._name, 
+        value= lambda_bucket._name, 
         type = "PLAINTEXT"
     )]
   ),
@@ -147,20 +140,20 @@ codepipeline = aws.codepipeline.Pipeline("Pulumi",
                 },
             )],
         ),
-        aws.codepipeline.PipelineStageArgs(
-            name="Invoke",
-            actions=[aws.codepipeline.PipelineStageActionArgs(
-                name="Invoke",
-                category="Invoke",
-                owner="AWS",
-                provider="Lambda",
-                input_artifacts=["build_output"],
-                version="1",
-                configuration= {
-                  "FunctionName": pipelineLambda.name.apply(lambda function_name : f"{function_name}")
-                },
-            )],
-        ),
+        # aws.codepipeline.PipelineStageArgs(
+        #     name="Invoke",
+        #     actions=[aws.codepipeline.PipelineStageActionArgs(
+        #         name="Invoke",
+        #         category="Invoke",
+        #         owner="AWS",
+        #         provider="Lambda",
+        #         input_artifacts=["build_output"],
+        #         version="1",
+        #         configuration= {
+        #           "FunctionName": pipelineLambda.name.apply(lambda function_name : f"{function_name}")
+        #         },
+        #     )],
+        # ),
     ])
 
 
@@ -174,9 +167,8 @@ pulumi.export("CodeBuild", {
     "arn": new_website.arn,
     "name": new_website.name
 })
-pulumi.export("S3_zipped_bucket",codepipeline_zipped._name)
 pulumi.export("connect arn", connection.arn)
-pulumi.export("lambda arn", pipelineLambda.arn)
+# pulumi.export("lambda arn", pipelineLambda.arn)
 pulumi.export("codebuild",  {
     "arn": new_website.arn,
     "id": new_website.id

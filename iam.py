@@ -1,17 +1,9 @@
 import pulumi, json
-import pulumi_aws as aws 
+import pulumi_aws as aws
+from buckets import *
 
 
-#artifactbucket
-codepipeline_artifact_store = aws.s3.Bucket("codepipelineBucketArtifactStore",)
-
-#bucket for the build to zip all the files
-codepipeline_zipped = aws.s3.Bucket("codepipelinebucketzipped",
-                                    bucket = "codepipelinebucketzipped",
-                                    # opts = pulumi.ResourceOptions(delete_before_replace = True)
-)
-
-# role for lambda 
+#role for lambda 
 lambdarole = aws.iam.Role("roleForLambda", assume_role_policy="""{
   "Version": "2012-10-17",
   "Statement": [
@@ -56,7 +48,7 @@ codeBuild_role = aws.iam.Role("codebuildRolePulumi", assume_role_policy="""{
 }
 """)
 lambda_policy = aws.iam.Policy('LambdaPolicyWebsite',
-                               policy= codepipeline_zipped.arn.apply(lambda zippeds3 : f'''{{
+                               policy= lambda_bucket.arn.apply(lambda website: f'''{{
     "Version": "2012-10-17",
       "Statement": [
         {{
@@ -64,11 +56,8 @@ lambda_policy = aws.iam.Policy('LambdaPolicyWebsite',
             "Effect": "Allow",
             "Action": "s3:*",
             "Resource": [
-                "{zippeds3+"/*"}",
-                "{zippeds3}",
-                "arn:aws:s3:::richardcraddock.me",
-                "arn:aws:s3:::richardcraddock.me/*"
-               
+                "{website+"/*"}",
+                "{website}"
     ]
         }},
         {{
@@ -118,6 +107,7 @@ codebuild_policy = aws.iam.Policy("NewWebsiteCodebuild",
             "Action": [
                 "s3:*",
                 "s3:PutObject",
+                "s3:PutObjectAcl",
                 "s3:GetObject",
                 "s3:GetObjectVersion",
                 "s3:GetBucketAcl",
@@ -168,9 +158,9 @@ connectPolicy = aws.iam.RolePolicy("connectionPolicy",
             }]
     }))
 
-role_policy_attachment = aws.iam.RolePolicyAttachment("lambdaRoleAttachment",
-    role=lambdarole.name, 
-    policy_arn=lambda_policy.arn)
+# role_policy_attachment = aws.iam.RolePolicyAttachment("lambdaRoleAttachment",
+#     role=lambdarole.name, 
+#     policy_arn=lambda_policy.arn)
 
 
 codeBuild_attachment = aws.iam.RolePolicyAttachment(
