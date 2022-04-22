@@ -14,13 +14,11 @@ connection = aws.codestarconnections.Connection(
 zone = aws.route53.get_zone(
                                name = "richardcraddock.me",
                                private_zone= False,
-                               tags= {
-                                 "Name": "Pulumi_resume"
-                               }
+                               
                                )
 
-
-
+#certs for cloudfront
+#validate certs in the console 
 cert = aws.acm.Certificate("resume_cert",
                            domain_name = "richardcraddock.me",
                            tags={
@@ -35,19 +33,18 @@ cert = aws.acm.Certificate("www_resume_cert",
                            },
                            validation_method="DNS")
 
-
-# aws.route53.Record(f"{www_bucket.bucket}",
-#                        name = "www.richardcraddock.com",
-#                        type = aws.route53.RecordType("A"),
-#                        zone_id = zone.zone_id,
-#                        aliases= [
-#                            aws.route53.RecordAliasArgs(
-#                                evaluate_target_health= False,
-#                                name= lambda_bucket.website_domain,
-#                                zone_id=zone.zone_id
-#                        )]
-#                        )
-
+# need to change if buckets.py changes into a function NOTE
+# cloudfront_dns = []
+# for n in website_buckets:
+  
+#   Distribution = aws.cloudfront.Distribution('resume_pulumi',
+#                                             origins= [aws.cloudfront.DistributionOriginArgs(
+#                                               domain_name = n.bucket_regional_domain_name,
+#                                               origin_id= 
+#                                             )],
+#                                             default_cache_behavior=aws.cloudfront.DistributionDefaultCacheBehaviorArgs(
+#                                               allowed_methods= [""]
+#                                             ))
 
 
 
@@ -68,7 +65,7 @@ cert = aws.acm.Certificate("www_resume_cert",
 # #   environment = 
 # )
 
-# #Do i need this? what is this doing? FIXME: NOTE
+
 # lambda_permission = aws.lambda_.Permission("lambdaPermission", 
 #     action="lambda:*",
 #     principal="s3.amazonaws.com",
@@ -86,7 +83,7 @@ new_website = aws.codebuild.Project("new_website",
     compute_type= "BUILD_GENERAL1_SMALL",
     environment_variables= [aws.codebuild.ProjectEnvironmentEnvironmentVariableArgs(
         name= "S3_BUCKET",
-        value= lambda_bucket._name, 
+        value= bucket._name, 
         type = "PLAINTEXT"
     )]
   ),

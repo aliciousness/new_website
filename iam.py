@@ -48,7 +48,7 @@ codeBuild_role = aws.iam.Role("codebuildRolePulumi", assume_role_policy="""{
 }
 """)
 lambda_policy = aws.iam.Policy('LambdaPolicyWebsite',
-                               policy= lambda_bucket.arn.apply(lambda website: f'''{{
+                               policy= bucket.arn.apply(lambda website: f'''{{
     "Version": "2012-10-17",
       "Statement": [
         {{
