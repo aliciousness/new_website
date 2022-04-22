@@ -1,24 +1,9 @@
 import pulumi, json
 import pulumi_aws as aws
-from buckets import *
+from buckets import CreateBuckets
 
 
-#role for lambda 
-lambdarole = aws.iam.Role("roleForLambda", assume_role_policy="""{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": "lambda.amazonaws.com"
-      },
-      "Effect": "Allow",
-      "Sid": ""
-    }
-  ]
-}
-""")
-
+buckets = CreateBuckets("richardcraddock.me")
 #role for pipeline 
 codepipeline_role = aws.iam.Role("codepipelineRole", assume_role_policy = """{
   "Version": "2012-10-17",
@@ -47,44 +32,9 @@ codeBuild_role = aws.iam.Role("codebuildRolePulumi", assume_role_policy="""{
   ]
 }
 """)
-lambda_policy = aws.iam.Policy('LambdaPolicyWebsite',
-                               policy= bucket.arn.apply(lambda website: f'''{{
-    "Version": "2012-10-17",
-      "Statement": [
-        {{
-            "Sid": "VisualEditor1",
-            "Effect": "Allow",
-            "Action": "s3:*",
-            "Resource": [
-                "{website+"/*"}",
-                "{website}"
-    ]
-        }},
-        {{
-          "Effect": "Allow",
-            "Action": [
-                "codepipeline:GetPipeline",
-                "codepipeline:GetPipelineState",
-                "codepipeline:GetPipelineExecution",
-                "codepipeline:ListPipelineExecutions",
-                "codepipeline:ListPipelines",
-                "codepipeline:PutApprovalResult"
-            ],
-            "Resource": "arn:aws:codepipeline:us-east-1:037484876593:Pulumi-*"
-        }},
-        {{
-            "Effect": "Allow",
-            "Action": [
-                "logs:CreateLogGroup",
-                "logs:CreateLogStream",
-                "logs:PutLogEvents"
-            ],
-            "Resource": "*"
-        }}
-    ]
-}}'''))
+
 codebuild_policy = aws.iam.Policy("NewWebsiteCodebuild",
-                                  policy= codepipeline_artifact_store.arn.apply(lambda artifactS3 : f'''{{
+                                  policy= buckets["codepipeline_artifact_store"].arn.apply(lambda artifactS3 : f'''{{
     "Version": "2012-10-17",
     "Statement": [
         {{
@@ -158,9 +108,7 @@ connectPolicy = aws.iam.RolePolicy("connectionPolicy",
             }]
     }))
 
-# role_policy_attachment = aws.iam.RolePolicyAttachment("lambdaRoleAttachment",
-#     role=lambdarole.name, 
-#     policy_arn=lambda_policy.arn)
+
 
 
 codeBuild_attachment = aws.iam.RolePolicyAttachment(
@@ -177,6 +125,5 @@ codePipeline_attachment = aws.iam.RolePolicyAttachment(
 
 pulumi.export("IAM",{
   "codebuild role arn": codeBuild_role.arn,
-  "codepipeline role arn": codepipeline_role.arn,
-  "lambda role": lambdarole.arn
+  "codepipeline role arn": codepipeline_role.arn
 })
