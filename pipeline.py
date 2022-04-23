@@ -1,7 +1,7 @@
 import pulumi 
 import pulumi_aws as aws 
 from iam import *
-from buckets import *
+
 
 
 def CreatePipeline(dns):
@@ -46,7 +46,7 @@ def CreatePipeline(dns):
         "Name": dns
     },
     artifact_store=aws.codepipeline.PipelineArtifactStoreArgs(
-        location=codepipeline_artifact_store.bucket,
+        location=buckets["codepipeline_artifact_store"].bucket,
         type="S3",
     ),
     stages=[
