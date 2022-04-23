@@ -40,6 +40,22 @@ website_buckets.append(bucket)
   #bucket for redirect for www
 www_bucket = aws.s3.Bucket(f"www.{dns}",
                            bucket= f"www.{dns}",
+                           policy = f'''{{
+    "Version": "2012-10-17",
+    "Statement": [
+        {{
+            "Sid": "PublicReadGetObject",
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": [
+                "s3:GetObject"
+            ],
+            "Resource": [
+                "arn:aws:s3:::www.{dns}/*"
+            ]
+        }}
+    ]
+}}''',
                            website= aws.s3.BucketWebsiteArgs(
                              redirect_all_requests_to= "https://richardcraddock.me"
                            ))
