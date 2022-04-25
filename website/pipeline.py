@@ -1,34 +1,33 @@
 import pulumi 
 import pulumi_aws as aws 
-from iam import *
+from website.iam import *
+from website.acm import connection
+import website.buckets
 
 
 
 def CreatePipeline(dns):
     
     
-    #connection for Github
-    connection = aws.codestarconnections.Connection(
-        "github_connection", 
-        provider_type="GitHub")
+    
     
     #build project
     new_website = aws.codebuild.Project(f"build-project-{dns}",
                                         artifacts = aws.codebuild.ProjectArtifactsArgs(
                                             type = "CODEPIPELINE",
-                                            location = codepipeline_artifact_store.arn.apply(lambda artifactS3 : f"{artifactS3}")
+                                            location = buckets.codepipeline_artifact_store.arn.apply(lambda artifactS3 : f"{artifactS3}")
                                             ),
                                         environment = aws.codebuild.ProjectEnvironmentArgs(
                                             image= "aws/codebuild/standard:4.0",
                                             type = "LINUX_CONTAINER",compute_type= "BUILD_GENERAL1_SMALL",environment_variables= [aws.codebuild.ProjectEnvironmentEnvironmentVariableArgs(
                                                 name= "S3_BUCKET",
-                                                value= bucket._name, 
+                                                value= website.bucket._name, 
                                                 type = "PLAINTEXT"
                                                 )]
                                             ),
                                         service_role= codeBuild_role.arn,source= aws.codebuild.ProjectSourceArgs(
                                             type= "CODEPIPELINE",
-                                            location = codepipeline_artifact_store.arn.apply(lambda artifactS3 : f"{artifactS3}"
+                                            location = buckets.codepipeline_artifact_store.arn.apply(lambda artifactS3 : f"{artifactS3}"
                                                                                              )),
                                         build_timeout= 5,
                                         queued_timeout= 20,
@@ -46,7 +45,7 @@ def CreatePipeline(dns):
         "Name": dns
     },
     artifact_store=aws.codepipeline.PipelineArtifactStoreArgs(
-        location=buckets["codepipeline_artifact_store"].bucket,
+        location=buckets["buckets.codepipeline_artifact_store"].website.bucket,
         type="S3",
     ),
     stages=[

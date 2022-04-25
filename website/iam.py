@@ -1,9 +1,8 @@
 import pulumi, json
 import pulumi_aws as aws
-from buckets import CreateBuckets
+import website.buckets as buckets
 
 
-buckets = CreateBuckets("richardcraddock.me")
 #role for pipeline 
 codepipeline_role = aws.iam.Role("codepipelineRole", assume_role_policy = """{
   "Version": "2012-10-17",
@@ -34,7 +33,7 @@ codeBuild_role = aws.iam.Role("codebuildRolePulumi", assume_role_policy="""{
 """)
 
 codebuild_policy = aws.iam.Policy("NewWebsiteCodebuild",
-                                  policy= buckets["codepipeline_artifact_store"].arn.apply(lambda artifactS3 : f'''{{
+                                  policy= buckets.codepipeline_artifact_store.arn.apply(lambda artifactS3 : f'''{{
     "Version": "2012-10-17",
     "Statement": [
         {{

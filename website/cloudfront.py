@@ -1,11 +1,12 @@
 import pulumi 
 import pulumi_aws as aws 
-from buckets import *
-from acm import CreateCerts 
+from website.buckets import *
+import website.acm  as acm
+from website.buckets import CreateBuckets
 
 
 def CreateDistribution(dns):
-    cert = CreateCerts(dns)
+    
 
     Distribution = aws.cloudfront.Distribution(f'{dns}',
                                              enabled= True,
@@ -15,8 +16,8 @@ def CreateDistribution(dns):
                                              aliases=[f"{dns}"],
                                              wait_for_deployment= False,
                                              origins= [aws.cloudfront.DistributionOriginArgs(
-                                               domain_name = bucket.bucket_regional_domain_name,
-                                               origin_id= bucket.id
+                                               domain_name = CreateBuckets.bucket.bucket_regional_domain_name,
+                                               origin_id= CreateBuckets.bucket.id
                                             )],
                                             default_cache_behavior=aws.cloudfront.DistributionDefaultCacheBehaviorArgs(
                                               allowed_methods= [
@@ -27,7 +28,7 @@ def CreateDistribution(dns):
                                                 "GET",
                                                 "HEAD"
                                                 ],
-                                              target_origin_id= bucket.id,
+                                              target_origin_id= CreateBuckets.bucket.id,
                                               viewer_protocol_policy= "redirect-to-https",
                                               forwarded_values= aws.cloudfront.DistributionDefaultCacheBehaviorForwardedValuesArgs(
                                                 query_string= False,
@@ -53,7 +54,7 @@ def CreateDistribution(dns):
                                               response_code= 404
                                             )],
                                             viewer_certificate= aws.cloudfront.DistributionViewerCertificateArgs(
-                                              acm_certificate_arn= cert[0],
+                                              acm_certificate_arn= acm.cert,
                                               ssl_support_method='sni-only'
                                             ),
                                             tags= {
@@ -71,8 +72,8 @@ def CreateDistribution(dns):
                                              aliases=[f"www.{dns}"],
                                              wait_for_deployment= False,
                                              origins= [aws.cloudfront.DistributionOriginArgs(
-                                               domain_name = www_bucket.bucket_regional_domain_name,
-                                               origin_id= www_bucket.id
+                                               domain_name = CreateBuckets.www_bucket.bucket_regional_domain_name,
+                                               origin_id= CreateBuckets.www_bucket.id
                                             )],
                                             default_cache_behavior=aws.cloudfront.DistributionDefaultCacheBehaviorArgs(
                                               allowed_methods= [
@@ -83,7 +84,7 @@ def CreateDistribution(dns):
                                                 "GET",
                                                 "HEAD"
                                                 ],
-                                              target_origin_id= www_bucket.id,
+                                              target_origin_id= CreateBuckets.www_bucket.id,
                                               viewer_protocol_policy= "redirect-to-https",
                                               forwarded_values= aws.cloudfront.DistributionDefaultCacheBehaviorForwardedValuesArgs(
                                                 query_string= False,
@@ -109,7 +110,7 @@ def CreateDistribution(dns):
                                               response_code= 404
                                             )],
                                             viewer_certificate= aws.cloudfront.DistributionViewerCertificateArgs(
-                                              acm_certificate_arn= cert[1],
+                                              acm_certificate_arn= acm.www_cert,
                                               ssl_support_method='sni-only'
                                             ),
                                             tags= {

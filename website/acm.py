@@ -6,6 +6,12 @@ import pulumi_aws as aws
 # CERTS MUCTS BE VALIDATED IN THE CONSOLE 
 
 def CreateCerts(dns):
+  
+    #connection for Github
+    connection = aws.codestarconnections.Connection(
+        "github_connection", 
+        provider_type="GitHub")
+    
     cert = aws.acm.Certificate(f"{dns}",
                            domain_name = f"dns",
                            tags={
@@ -21,4 +27,8 @@ def CreateCerts(dns):
                              "Environment": f"www.{dns}"
                            },
                            validation_method="DNS")
-    return [cert.arn,www_cert.arn]
+    return {
+      "connection": connection.arn,
+      "cert" : cert.arn,
+      "www_cert": www_cert.arn
+      }
