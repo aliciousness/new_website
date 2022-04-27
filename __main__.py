@@ -33,43 +33,7 @@ cert = aws.acm.Certificate("www_resume_cert",
                            },
                            validation_method="DNS")
 
-# need to change if buckets.py changes into a function NOTE
-# cloudfront_dns = []
-# for n in website_buckets:
-  
-#   Distribution = aws.cloudfront.Distribution('resume_pulumi',
-#                                             origins= [aws.cloudfront.DistributionOriginArgs(
-#                                               domain_name = n.bucket_regional_domain_name,
-#                                               origin_id= 
-#                                             )],
-#                                             default_cache_behavior=aws.cloudfront.DistributionDefaultCacheBehaviorArgs(
-#                                               allowed_methods= [""]
-#                                             ))
 
-
-
-
-#kms key
-# s3kmskey = aws.kms.Key("key",
-#                        deletion_window_in_days=10,
-#                        description= "key1")
-# kmsalias = aws.kms.Alias("alias", target_key_id=s3kmskey.key_id)
-
-#lambda function for pipeline
-# pipelineLambda = aws.lambda_.Function("Pulumifunction",
-#   code = pulumi.FileArchive("./lambda.zip"),
-#   role = lambdarole.arn,
-#   runtime = "python3.8",
-#   handler = "index.handler",
-#   timeout= 30
-# #   environment = 
-# )
-
-
-# lambda_permission = aws.lambda_.Permission("lambdaPermission", 
-#     action="lambda:*",
-#     principal="s3.amazonaws.com",
-#     function= pipelineLambda)
 
 #codebuild project
 new_website = aws.codebuild.Project("new_website",
@@ -80,12 +44,7 @@ new_website = aws.codebuild.Project("new_website",
   environment = aws.codebuild.ProjectEnvironmentArgs(
     image= "aws/codebuild/standard:4.0",
     type = "LINUX_CONTAINER",
-    compute_type= "BUILD_GENERAL1_SMALL",
-    environment_variables= [aws.codebuild.ProjectEnvironmentEnvironmentVariableArgs(
-        name= "S3_BUCKET",
-        value= bucket._name, 
-        type = "PLAINTEXT"
-    )]
+    compute_type= "BUILD_GENERAL1_SMALL"
   ),
   service_role= codeBuild_role.arn,
   source= aws.codebuild.ProjectSourceArgs(
@@ -137,20 +96,6 @@ codepipeline = aws.codepipeline.Pipeline("Pulumi",
                 },
             )],
         ),
-        # aws.codepipeline.PipelineStageArgs(
-        #     name="Invoke",
-        #     actions=[aws.codepipeline.PipelineStageActionArgs(
-        #         name="Invoke",
-        #         category="Invoke",
-        #         owner="AWS",
-        #         provider="Lambda",
-        #         input_artifacts=["build_output"],
-        #         version="1",
-        #         configuration= {
-        #           "FunctionName": pipelineLambda.name.apply(lambda function_name : f"{function_name}")
-        #         },
-        #     )],
-        # ),
     ])
 
 

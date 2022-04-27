@@ -158,9 +158,6 @@ connectPolicy = aws.iam.RolePolicy("connectionPolicy",
             }]
     }))
 
-# role_policy_attachment = aws.iam.RolePolicyAttachment("lambdaRoleAttachment",
-#     role=lambdarole.name, 
-#     policy_arn=lambda_policy.arn)
 
 
 codeBuild_attachment = aws.iam.RolePolicyAttachment(

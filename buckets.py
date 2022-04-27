@@ -84,30 +84,7 @@ www_cert = aws.acm.Certificate("www_resume_acm_cert",
                            },
                            validation_method="DNS")
 
-# record = aws.route53.Record(f"{dns}",
-#                         name = f"{dns}",
-#                         type = "A",
-#                         zone_id = zone.zone_id,
-#                         aliases= [
-#                             aws.route53.RecordAliasArgs(
-#                                 evaluate_target_health= False,
-#                                 name= bucket.website_domain,
-#                                 zone_id=bucket.hosted_zone_id
-#                         )]
-#                         )
 
-
-# www_record = aws.route53.Record(f"www.{dns}",
-#                         name = f"www.{dns}",
-#                         type = "A",
-#                         zone_id = zone.zone_id,
-#                         aliases= [
-#                             aws.route53.RecordAliasArgs(
-#                                 evaluate_target_health= False,
-#                                 name= www_bucket.website_domain,
-#                                 zone_id=www_bucket.hosted_zone_id
-#                         )]
-#                         )
 
 #need to change if buckets.py changes into a function NOTE
 Distribution = aws.cloudfront.Distribution(f'{dns}',
