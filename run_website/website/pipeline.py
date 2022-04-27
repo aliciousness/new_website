@@ -1,12 +1,11 @@
 import pulumi 
 import pulumi_aws as aws 
 from website.iam import *
-from website.acm import connection
 import website.buckets
 
 
 
-def CreatePipeline(dns):
+def CreatePipeline(dns,repository_id,connection_arn):
     
     
     
@@ -45,7 +44,7 @@ def CreatePipeline(dns):
         "Name": dns
     },
     artifact_store=aws.codepipeline.PipelineArtifactStoreArgs(
-        location=buckets["buckets.codepipeline_artifact_store"].website.bucket,
+        location=buckets.codepipeline_artifact_store.bucket,
         type="S3",
     ),
     stages=[
@@ -59,8 +58,8 @@ def CreatePipeline(dns):
                 version="1",
                 output_artifacts=["source_output"],
                 configuration={
-                    "ConnectionArn": connection.arn,
-                    "FullRepositoryId": "aliciousness/resume",
+                    "ConnectionArn": connection_arn,
+                    "FullRepositoryId": f"{repository_id}",
                     "BranchName": "main",
                     
                 },

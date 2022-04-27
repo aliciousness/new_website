@@ -3,14 +3,14 @@ import pulumi_aws as aws
 
 #certs for cloudfront
 #IMPORTANT 
-# CERTS MUCTS BE VALIDATED IN THE CONSOLE 
+# CERTS MUST BE VALIDATED IN THE CONSOLE 
 
-def CreateCerts(dns):
+def CreateCerts(dns,provider_type="Github"):
   
     #connection for Github
     connection = aws.codestarconnections.Connection(
-        "github_connection", 
-        provider_type="GitHub")
+        f"{provider_type}_connection", 
+        provider_type=f"{provider_type}")
     
     cert = aws.acm.Certificate(f"{dns}",
                            domain_name = f"dns",
@@ -29,6 +29,6 @@ def CreateCerts(dns):
                            validation_method="DNS")
     return {
       "connection": connection.arn,
-      "cert" : cert.arn,
-      "www_cert": www_cert.arn
+      "certs":
+        [cert.arn, www_cert.arn]
       }

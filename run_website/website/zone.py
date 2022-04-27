@@ -8,3 +8,4 @@ def GetR53Zone(dns):
                                private_zone= False,
                                
                                )
+    return zone.zone_id

@@ -1,11 +1,10 @@
 import pulumi 
 import pulumi_aws as aws 
 from website.buckets import *
-import website.acm  as acm
-from website.buckets import CreateBuckets
 
 
-def CreateDistribution(dns):
+
+def CreateDistribution(dns,certs):
     
 
     Distribution = aws.cloudfront.Distribution(f'{dns}',
@@ -54,12 +53,12 @@ def CreateDistribution(dns):
                                               response_code= 404
                                             )],
                                             viewer_certificate= aws.cloudfront.DistributionViewerCertificateArgs(
-                                              acm_certificate_arn= acm.cert,
+                                              acm_certificate_arn= certs[0],
                                               ssl_support_method='sni-only'
                                             ),
                                             tags= {
                                               "Name": dns,
-                                              "evnironment": dns
+                                              "environment": dns
                                             }
                                             )
 
@@ -110,12 +109,18 @@ def CreateDistribution(dns):
                                               response_code= 404
                                             )],
                                             viewer_certificate= aws.cloudfront.DistributionViewerCertificateArgs(
-                                              acm_certificate_arn= acm.www_cert,
+                                              acm_certificate_arn= certs[1],
                                               ssl_support_method='sni-only'
                                             ),
                                             tags= {
                                               "Name": "Pulumi_resume",
-                                              "evnironment": "www.richardcraddock.me"
+                                              "environment": f"www.{dns}"
                                             }
                                             )
+    
+    return {
+      "Distribution":
+        [Distribution.domain_name,Distribution.hosted_zone_id],
+      "www_Distribution":
+        [www_Distribution.domain_name,www_Distribution.hosted_zone_id]}
     

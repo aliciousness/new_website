@@ -2,30 +2,30 @@ import pulumi
 import pulumi_aws as aws
 from website.cloudfront import * 
 from website.zone import GetR53Zone
-import website.cloudfront as cloudfront
 
 
-def CreateRecord(dns):
+
+def CreateRecord(dns,distribution,www_distribution,zone_id):
     zone = GetR53Zone(dns)
     record = aws.route53.Record(f"{dns}",
                         name = f"{dns}",
                         type = "A",
-                        zone_id = zone.zone_id,
+                        zone_id = zone,
                         aliases= [
                             aws.route53.RecordAliasArgs(
                                 evaluate_target_health= False,
-                                name= cloudfront.Distribution.domain_name,
-                                zone_id=cloudfront.Distribution.hosted_zone_id
+                                name= distribution[0],
+                                zone_id=distribution[1]
                         )]
                         )
     www_record = aws.route53.Record(f"www.{dns}",
                         name = f"www.{dns}",
                         type = "A",
-                        zone_id = zone.zone_id,
+                        zone_id = zone,
                         aliases= [
                             aws.route53.RecordAliasArgs(
                                 evaluate_target_health= False,
-                                name= cloudfront.www_Distribution.domain_name,
-                                zone_id=cloudfront.www_Distribution.hosted_zone_id
+                                name= www_distribution[0],
+                                zone_id=www_distribution[1]
                         )]
                         )
