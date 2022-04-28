@@ -12,7 +12,7 @@ zone = aws.route53.get_zone(
 
 #website buckets 
 website_buckets = []
-#bucket for lambda
+#main website bucket
 bucket = aws.s3.Bucket(f"{dns}",
                               bucket = f"{dns}",   
                               acl= "public-read",
