@@ -44,7 +44,12 @@ new_website = aws.codebuild.Project("new_website",
   environment = aws.codebuild.ProjectEnvironmentArgs(
     image= "aws/codebuild/standard:4.0",
     type = "LINUX_CONTAINER",
-    compute_type= "BUILD_GENERAL1_SMALL"
+    compute_type= "BUILD_GENERAL1_SMALL",
+    environment_variables= [aws.codebuild.ProjectEnvironmentEnvironmentVariableArgs(
+        name= "S3_BUCKET",
+        value= bucket._name, 
+        type = "PLAINTEXT"
+    )]
   ),
   service_role= codeBuild_role.arn,
   source= aws.codebuild.ProjectSourceArgs(
