@@ -1,10 +1,10 @@
 import pulumi 
 import pulumi_aws as aws 
-from website.buckets import *
 
 
 
-def CreateDistribution(dns,certs):
+
+def CreateDistribution(dns,certs,bucket_regional_domain_name,bucket_id):
     
 
     Distribution = aws.cloudfront.Distribution(f'{dns}',
@@ -15,8 +15,8 @@ def CreateDistribution(dns,certs):
                                              aliases=[f"{dns}"],
                                              wait_for_deployment= False,
                                              origins= [aws.cloudfront.DistributionOriginArgs(
-                                               domain_name = CreateBuckets.bucket.bucket_regional_domain_name,
-                                               origin_id= CreateBuckets.bucket.id
+                                               domain_name = bucket_regional_domain_name[0],
+                                               origin_id= bucket_id[0]
                                             )],
                                             default_cache_behavior=aws.cloudfront.DistributionDefaultCacheBehaviorArgs(
                                               allowed_methods= [
@@ -27,7 +27,7 @@ def CreateDistribution(dns,certs):
                                                 "GET",
                                                 "HEAD"
                                                 ],
-                                              target_origin_id= CreateBuckets.bucket.id,
+                                              target_origin_id= bucket_id[0],
                                               viewer_protocol_policy= "redirect-to-https",
                                               forwarded_values= aws.cloudfront.DistributionDefaultCacheBehaviorForwardedValuesArgs(
                                                 query_string= False,
@@ -71,8 +71,8 @@ def CreateDistribution(dns,certs):
                                              aliases=[f"www.{dns}"],
                                              wait_for_deployment= False,
                                              origins= [aws.cloudfront.DistributionOriginArgs(
-                                               domain_name = CreateBuckets.www_bucket.bucket_regional_domain_name,
-                                               origin_id= CreateBuckets.www_bucket.id
+                                               domain_name = bucket_regional_domain_name[1],
+                                               origin_id= bucket_id[1]
                                             )],
                                             default_cache_behavior=aws.cloudfront.DistributionDefaultCacheBehaviorArgs(
                                               allowed_methods= [
@@ -83,7 +83,7 @@ def CreateDistribution(dns,certs):
                                                 "GET",
                                                 "HEAD"
                                                 ],
-                                              target_origin_id= CreateBuckets.www_bucket.id,
+                                              target_origin_id= bucket_id[1],
                                               viewer_protocol_policy= "redirect-to-https",
                                               forwarded_values= aws.cloudfront.DistributionDefaultCacheBehaviorForwardedValuesArgs(
                                                 query_string= False,

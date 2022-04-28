@@ -1,6 +1,11 @@
 import pulumi, json
 import pulumi_aws as aws
-import website
+from run_website.website.acm import CreateCerts
+from run_website.website.buckets import CreateBuckets
+from run_website.website.cloudfront import CreateDistribution
+from run_website.website.pipeline import CreatePipeline
+from run_website.website.r53 import CreateRecord
+from run_website.website.zone import GetZone
 
 
 class Website():
@@ -12,27 +17,33 @@ class Website():
         self.provider_type = provider_type
         # repository provider IE
         
-        self.acm = website.acm(
+        self.acm = CreateCerts(
             dns = self.dns,
             provider_type = self.provider_type
         )
-        self.zone = website.GetR53Zone(dns=self.dns)
+        self.zone =GetZone(dns=self.dns)
         
     def run_website(self):
-        buckets =website.CreateBuckets(dns=self.dns)
+        buckets =CreateBuckets(dns=self.dns)
         
-        pipeline=website.CreatePipeline(
+        pipeline=CreatePipeline(
             dns=self.dns,
             repository_id=self.repository_id,
-            connection_arn = self.acm["connection"])
+            connection_arn = self.acm["connection"],
+            artifact_bucket= buckets['artifact_bucket'][1],
+            artifact_bucket_arn=buckets['artifact_bucket'][0],
+            main_bucket_name=buckets['bucket_name'])
         
-        distribution=website.CreateDistribution(
+        distribution=CreateDistribution(
             dns=self.dns,
-            certs = self.acm["certs"])
+            certs = self.acm["certs"],
+            bucket_regional_domain_name= buckets['bucket_id'],
+            bucket_id= buckets['bucket_regional_domain_name'])
         
-        record = website.CreateRecord(
+        record = CreateRecord(
             dns=self.dns,
-            distribution = distribution["distribution"],
-            www_distribution = distribution["www_distribution"],
+            distribution = distribution["Distribution"],
+            www_distribution = distribution["www_Distribution"],
             zone_id= self.zone)
+        
         

@@ -15,4 +15,5 @@ init = Website(
     repository_id="aliciousness/resume",
     provider_type="GitHub")
 
-# init.run_website()
+
+init.run_website()

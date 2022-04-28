@@ -1,9 +1,11 @@
-import pulumi 
+import pulumi,json
 import pulumi_aws as aws
 
 #certs for cloudfront
 #IMPORTANT 
 # CERTS MUST BE VALIDATED IN THE CONSOLE 
+
+
 
 def CreateCerts(dns,provider_type="Github"):
   
@@ -27,6 +29,9 @@ def CreateCerts(dns,provider_type="Github"):
                              "Environment": f"www.{dns}"
                            },
                            validation_method="DNS")
+    
+    print("COMPLETED")
+    
     return {
       "connection": connection.arn,
       "certs":

@@ -61,7 +61,14 @@ def CreateBuckets(dns):
     "www.richardcraddock_bucket_arn": www_bucket.arn,
     "artifact_bucket_arn": codepipeline_artifact_store.arn
     })
-  
+  return {
+        "bucket_id":
+            [bucket.id,www_bucket.id],
+        "bucket_regional_domain_name":
+            [bucket.bucket_regional_domain_name,www_bucket.bucket_regional_domain_name],
+        "artifact_bucket": [codepipeline_artifact_store.arn,codepipeline_artifact_store.bucket],
+        "bucket_name": bucket._name
+              }
 
 
 
