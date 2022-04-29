@@ -14,8 +14,8 @@ IMPORTANT
 '''
 
 init = Website(
-    dns="omnifoodsolutions.com",
-    repository_id="aliciousness/omnifood-project",
+    dns="richardcraddock.me",
+    repository_id="aliciousness/resume",
     provider_type="GitHub").check_validation("aliciousness")
 
 
