@@ -173,7 +173,7 @@ codePipeline_attachment = aws.iam.RolePolicyAttachment(
 )
 
 pulumi.export("IAM",{
-  "codebuild role arn": codeBuild_role.arn,
-  "codepipeline role arn": codepipeline_role.arn,
-  "lambda role": lambdarole.arn
+  "codebuild_role_arn": codeBuild_role.arn,
+  "codepipeline_role arn": codepipeline_role.arn,
+  "lambda_role": lambdarole.arn
 })

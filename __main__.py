@@ -106,15 +106,15 @@ codepipeline = aws.codepipeline.Pipeline("Pulumi",
 
 
 pulumi.export("Connect",{
-    "connection arn" : connection.arn,
-    "connection status": connection.connection_status,
-    "connection id": connection.id,
+    "connection_arn" : connection.arn,
+    "connection_status": connection.connection_status,
+    "connection_id": connection.id,
     "connection": connection.name})
 pulumi.export("CodeBuild", {
     "arn": new_website.arn,
     "name": new_website.name
 })
-pulumi.export("connect arn", connection.arn)
+pulumi.export("connect_arn", connection.arn)
 # pulumi.export("lambda arn", pipelineLambda.arn)
 pulumi.export("codebuild",  {
     "arn": new_website.arn,
