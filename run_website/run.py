@@ -50,7 +50,7 @@ class Website():
         output = StackReference(f"{company}/{project}/{stack}").get_output('Connect') #needs to be changed to "connection_status" BUG
 
         #if connection status is available then it runs the rest of the products 
-        if output['connection_status'] == "aVAILABLE":
+        if output['connection_status'] == "AVAILABLE":
             #needs to take out key BUG
             self.run_website()
         else:
