@@ -17,21 +17,7 @@ zone = aws.route53.get_zone(
                                
                                )
 
-#certs for cloudfront
-#validate certs in the console 
-cert = aws.acm.Certificate("resume_cert",
-                           domain_name = "richardcraddock.me",
-                           tags={
-                             "Environment": "richardcraddock.me"
-                           },
-                           validation_method="DNS")
 
-cert = aws.acm.Certificate("www_resume_cert",
-                           domain_name = "www.richardcraddock.me",
-                           tags={
-                             "Environment": "www.richardcraddock.me"
-                           },
-                           validation_method="DNS")
 
 
 
