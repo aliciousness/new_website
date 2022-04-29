@@ -58,7 +58,7 @@ def CreateDistribution(dns,certs,bucket_regional_domain_name,bucket_id):
                                             ),
                                             tags= {
                                               "Name": dns,
-                                              "environment": dns
+                                              "environment": "Pulumi"
                                             }
                                             )
 
@@ -114,7 +114,7 @@ def CreateDistribution(dns,certs,bucket_regional_domain_name,bucket_id):
                                             ),
                                             tags= {
                                               "Name": "Pulumi_resume",
-                                              "environment": f"www.{dns}"
+                                              "environment": "Pulumi"
                                             }
                                             )
     

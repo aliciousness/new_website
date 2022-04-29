@@ -35,7 +35,8 @@ def CreatePipeline(dns,repository_id,connection_arn,artifact_bucket_arn,artifact
                                         queued_timeout= 20,
                                         description= f"This build was built with pulumi for {dns}",
                                         tags={
-                                            "Name": dns
+                                            "Name": dns,
+                                            "Environment": "Pulumi"
                                         }
                                         )
     
@@ -44,7 +45,8 @@ def CreatePipeline(dns,repository_id,connection_arn,artifact_bucket_arn,artifact
     codepipeline = aws.codepipeline.Pipeline(f"pipeline-{dns}",
     role_arn=codepipeline_role.arn,
     tags={
-        "Name": dns
+        "Name": dns,
+        "Environment": "Pulumi"
     },
     artifact_store=aws.codepipeline.PipelineArtifactStoreArgs(
         location=artifact_bucket,
@@ -87,6 +89,9 @@ def CreatePipeline(dns,repository_id,connection_arn,artifact_bucket_arn,artifact
     
     #codebuild policy
     codebuild_policy = aws.iam.Policy("NewWebsiteCodebuild",
+                                  tags= {
+                                      "Environment": "Pulumi"
+                                  },
                                   policy= artifact_bucket_arn.apply(lambda artifactS3 : f'''{{
     "Version": "2012-10-17",
     "Statement": [
@@ -183,7 +188,9 @@ def CreatePipeline(dns,repository_id,connection_arn,artifact_bucket_arn,artifact
     
 
 
-codeBuild_role = aws.iam.Role("codebuildRolePulumi", assume_role_policy="""{
+codeBuild_role = aws.iam.Role("codebuildRolePulumi",
+                              tags= {"Environment":"Pulumi"},
+                              assume_role_policy="""{
   "Version": "2012-10-17",
   "Statement": [
     {
@@ -198,7 +205,9 @@ codeBuild_role = aws.iam.Role("codebuildRolePulumi", assume_role_policy="""{
 """)
 
 #role for pipeline 
-codepipeline_role = aws.iam.Role("codepipelineRole", assume_role_policy = """{
+codepipeline_role = aws.iam.Role("codepipelineRole",
+                                 tags= {"Environment": "Pulumi"},
+                                 assume_role_policy = """{
   "Version": "2012-10-17",
   "Statement": [
     {

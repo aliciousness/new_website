@@ -8,6 +8,9 @@ def CreateBuckets(dns):
   bucket = aws.s3.Bucket(f"{dns}",
                                   bucket = f"{dns}",   
                                   acl= "public-read",
+                                  tags= {
+                                      "Name": dns,
+                                         "Environment": "Pulumi"},
                                   policy = f'''{{
         "Version": "2012-10-17",
         "Statement": [
@@ -32,6 +35,10 @@ def CreateBuckets(dns):
       #bucket for redirect for www
   www_bucket = aws.s3.Bucket(f"www.{dns}",
                               bucket= f"www.{dns}",
+                              tags= {
+                                  "Name": f"www.{dns}",
+                                  "Environment": "Pulumi"
+                              },
                               policy = f'''{{
     "Version": "2012-10-17",
     "Statement": [
@@ -54,7 +61,11 @@ def CreateBuckets(dns):
     
 
     #artifactbucket
-  codepipeline_artifact_store = aws.s3.Bucket("codepipelineBucketArtifactStore",)
+  codepipeline_artifact_store = aws.s3.Bucket("codepipelineBucketArtifactStore",
+                                              tags={
+                                                  "Name": "artifact_bucket",
+                                                  "Environment": "Pulumi"
+                                              })
   
   pulumi.export("Buckets",{
     "richardcraddock_bucket_arn": bucket.arn,

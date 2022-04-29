@@ -12,13 +12,17 @@ def CreateCerts(dns,provider_type="Github"):
     #connection for Github
     connection = aws.codestarconnections.Connection(
         f"{provider_type}_connection", 
-        provider_type=f"{provider_type}")
+        provider_type=f"{provider_type}",
+        tags={
+                             "Name": dns,
+                             "Environment": "Pulumi"
+                           })
     
     cert = aws.acm.Certificate(f"{dns}",
-                           domain_name = f"dns",
+                           domain_name = f"{dns}",
                            tags={
                              "Name": dns,
-                             "Environment": dns
+                             "Environment": "Pulumi"
                            },
                            validation_method="DNS")
 
@@ -26,7 +30,7 @@ def CreateCerts(dns,provider_type="Github"):
                            domain_name = f"www.{dns}",
                            tags={
                              "Name": f"www.{dns}",
-                             "Environment": f"www.{dns}"
+                             "Environment": "Pulumi"
                            },
                            validation_method="DNS")
     
