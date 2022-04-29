@@ -8,5 +8,4 @@ def GetZone(dns):
                                private_zone= False,
                                
                                )
-    print("COMPLETED")
     return zone.zone_id

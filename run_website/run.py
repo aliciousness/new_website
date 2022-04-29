@@ -1,7 +1,7 @@
-import pulumi, json
+import json
 import pulumi_aws as aws
-
-from run_website.website import Pipeline, Zone, s3, r53,cloudfront,acm
+from pulumi import get_stack, StackReference, get_project
+from run_website.website import Acm, Pipeline, Zone, s3, r53,cloudfront
 
 
 class Website():
@@ -13,11 +13,12 @@ class Website():
         self.provider_type = provider_type
         # repository provider IE
         
-        self.acm = acm.CreateCerts(
+        self.acm = Acm.CreateCerts(
             dns = self.dns,
             provider_type = self.provider_type
         )
         self.zone =Zone.GetZone(dns=self.dns)
+    
         
     def run_website(self):
         buckets =s3.CreateBuckets(dns=self.dns)
@@ -41,5 +42,18 @@ class Website():
             distribution = distribution["Distribution"],
             www_distribution = distribution["www_Distribution"],
             zone_id= self.zone)
+    
+    #checks validation for connect for pipeline 
+    def check_validation(self,company):
+        project = get_project()
+        stack = get_stack()
+        output = StackReference(f"{company}/{project}/{stack}").get_output('Connect') #needs to be changed to "connection_status" BUG
+
+        #if connection status is available then it runs the rest of the products 
+        if output['connection_status'] == "aVAILABLE":
+            #needs to take out key BUG
+            self.run_website()
+        else:
+            print("please validate the proper resources. to continue forward or wait until connection status is available, this may take some time ")
         
         

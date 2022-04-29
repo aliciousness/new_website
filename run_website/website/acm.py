@@ -3,7 +3,7 @@ import pulumi_aws as aws
 
 #certs for cloudfront
 #IMPORTANT 
-# CERTS MUST BE VALIDATED IN THE CONSOLE 
+# CERTS  AND CONNECTION MUST BE VALIDATED IN THE CONSOLE 
 
 
 
