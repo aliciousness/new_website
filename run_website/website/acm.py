@@ -30,7 +30,7 @@ def CreateCerts(dns,provider_type="Github"):
                            },
                            validation_method="DNS")
     
-    print("COMPLETED")
+    pulumi.export("connection_status", connection.connection_status)
     
     return {
       "connection": connection.arn,

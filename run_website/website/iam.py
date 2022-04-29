@@ -1,6 +1,6 @@
 import pulumi, json
 import pulumi_aws as aws
-import run_website.website.buckets as buckets
+import run_website.website.s3 as s3
 
 
 # #role for pipeline 
