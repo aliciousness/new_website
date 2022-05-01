@@ -27,15 +27,15 @@ class Website():
             dns=self.dns,
             repository_id=self.repository_id,
             connection_arn = self.acm["connection"],
-            artifact_bucket= buckets['artifact_bucket'][1],
-            artifact_bucket_arn=buckets['artifact_bucket'][0],
+            artifact_bucket= buckets['artifact_bucket'],
+            artifact_bucket_arn=buckets['artifact_bucket_arn'],
             main_bucket_name=buckets['bucket_name'])
         
         distribution=cloudfront.CreateDistribution(
             dns=self.dns,
             certs = self.acm["certs"],
-            bucket_regional_domain_name= buckets['bucket_id'],
-            bucket_id= buckets['bucket_regional_domain_name'])
+            bucket_regional_domain_name= buckets['bucket_regional_domain_name'],
+            bucket_id= buckets['bucket_id'])
         
         record = r53.CreateRecord(
             dns=self.dns,
@@ -44,13 +44,11 @@ class Website():
             zone_id= self.zone)
     
     #checks validation for connect for pipeline 
-    def check_validation(self,company):
-        project = get_project()
-        stack = get_stack()
-        output = StackReference(f"{company}/{project}/{stack}").get_output('Connect') #needs to be changed to "connection_status" BUG
+    def check_validation(self,):
+        status = aws.codestarconnections.get_connection(self.acm['connection']).connection_status #needs to be changed to "connection_status" BUG
 
         #if connection status is available then it runs the rest of the products 
-        if output['connection_status'] == "AVAILABLE":
+        if status == "AVAILABLE":
             #needs to take out key BUG
             self.run_website()
         else:

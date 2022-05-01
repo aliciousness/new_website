@@ -16,6 +16,6 @@ IMPORTANT
 init = Website(
     dns="richardcraddock.me",
     repository_id="aliciousness/resume",
-    provider_type="GitHub").check_validation("aliciousness")
+    provider_type="GitHub").check_validation()
 
 

@@ -48,10 +48,10 @@ def CreatePipeline(dns,repository_id,connection_arn,artifact_bucket_arn,artifact
         "Name": dns,
         "Environment": "Pulumi"
     },
-    artifact_store=aws.codepipeline.PipelineArtifactStoreArgs(
+    artifact_stores=[aws.codepipeline.PipelineArtifactStoreArgs(
         location=artifact_bucket,
         type="S3",
-    ),
+    )],
     stages=[
         aws.codepipeline.PipelineStageArgs(
             name="Source",
