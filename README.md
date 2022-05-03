@@ -1,4 +1,4 @@
-##Infrastructure
+Infrastructure
 
 This is the infrastructure with AWS codepipeline, codebuild, lambda, and all dependencies to run a CI/CD platform for my [resume](https://github.com/aliciousness/resume).
 
