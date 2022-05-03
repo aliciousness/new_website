@@ -1,3 +1,3 @@
-#Infrasture
+#Infrastructure
 
-This is the infrasture with AWS codepipeline, codebuild, lambda, and all dependencies to run a CI/CD platform for https://github.com/aliciousness/resume.
+This is the infrastructure for my resume website. Using AWS codepipeline, codebuild, lambda, and all dependencies to run a CI/CD platform for [my resume](https://github.com/aliciousness/resume).
