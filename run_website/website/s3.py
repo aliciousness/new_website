@@ -21,6 +21,23 @@ def CreateBuckets(dns):
         ]
     }}'''
     
+    www_policy = f'''{{
+        "Version": "2012-10-17",
+        "Statement": [
+            {{
+                "Sid": "PublicReadGetObject",
+                "Effect": "Allow",
+                "Principal": "*",
+                "Action": [
+                    "s3:GetObject"
+                ],
+                "Resource": [
+                    "arn:aws:s3:::www.{dns}/*"
+                ]
+            }}
+        ]
+    }}'''
+    
     bucket = aws.s3.Bucket(f"{dns}",
                                   bucket = f"{dns}",   
                                   acl= "public-read",

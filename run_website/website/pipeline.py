@@ -44,10 +44,10 @@ def CreatePipeline(dns,repository_id,connection_arn,artifact_bucket_arn,artifact
     
     codepipeline = aws.codepipeline.Pipeline(f"pipeline-{dns}",
     role_arn=codepipeline_role.arn,
-    artifact_stores=[aws.codepipeline.PipelineArtifactStoreArgs(
+    artifact_store=aws.codepipeline.PipelineArtifactStoreArgs(
         location=artifact_bucket,
         type="S3",
-    )],
+    ),
     tags={
         "Name": dns,
         "Environment": "Pulumi"
