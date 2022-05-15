@@ -57,7 +57,7 @@ def CreateBuckets(dns):
                                   "Name": f"www.{dns}",
                                   "Environment": "Pulumi"
                               },
-                              policy = bucket_policy,
+                              policy = www_policy,
                               website= aws.s3.BucketWebsiteArgs(
                                 redirect_all_requests_to= "https://richardcraddock.me"
                               ))

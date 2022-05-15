@@ -22,6 +22,7 @@ def CreateDistribution(dns,certs,bucket_regional_domain_name,bucket_id):
                                               allowed_methods= [
                                                 "GET",
                                                 "HEAD",
+                                                "OPTIONS"
                                                 ],
                                               cached_methods = [
                                                 "GET",
@@ -78,6 +79,7 @@ def CreateDistribution(dns,certs,bucket_regional_domain_name,bucket_id):
                                               allowed_methods= [
                                                 "GET",
                                                 "HEAD",
+                                                "OPTIONS"
                                                 ],
                                               cached_methods = [
                                                 "GET",
