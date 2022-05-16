@@ -44,7 +44,8 @@ def CreateDistribution(dns,certs,bucket_regional_domain_name,bucket_id):
                                                   "US",
                                                   "CA",
                                                   "GB",
-                                                  "DE"
+                                                  "DE",
+                                                  "MX"
                                                 ]
                                               )
                                             ),
@@ -101,7 +102,8 @@ def CreateDistribution(dns,certs,bucket_regional_domain_name,bucket_id):
                                                   "US",
                                                   "CA",
                                                   "GB",
-                                                  "DE"
+                                                  "DE",
+                                                  "MX"
                                                 ]
                                               )
                                             ),
